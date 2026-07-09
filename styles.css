@@ -1,0 +1,487 @@
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    min-height: 100vh;
+
+    font-family: "Segoe UI", Arial, sans-serif;
+
+    background:
+    radial-gradient(circle at top, #243b55, #050505 65%);
+
+    color: white;
+
+}
+
+
+
+.app {
+
+    width: min(95%, 950px);
+
+    margin: 40px auto;
+
+    padding: 25px;
+
+}
+
+
+
+.header {
+
+    text-align: center;
+
+    animation: fadeIn .8s ease;
+
+}
+
+
+
+.header h1 {
+
+    font-size: 46px;
+
+    margin: 0;
+
+    background:
+    linear-gradient(90deg,#00eaff,#9b5cff);
+
+    -webkit-background-clip: text;
+
+    color: transparent;
+
+}
+
+
+
+.header p {
+
+    color: #aaa;
+
+    font-size: 18px;
+
+}
+
+
+
+
+
+.search-panel,
+.now-playing,
+.controls,
+.stations,
+.favorites-panel {
+
+    background:
+    rgba(255,255,255,.08);
+
+    backdrop-filter:
+    blur(15px);
+
+    border:
+    1px solid rgba(255,255,255,.12);
+
+    border-radius: 22px;
+
+    padding: 20px;
+
+    margin-top: 20px;
+
+    box-shadow:
+    0 10px 35px rgba(0,0,0,.5);
+
+}
+
+
+
+
+
+.search-row {
+
+    display:flex;
+
+    gap:10px;
+
+}
+
+
+
+input,
+select {
+
+    background:
+    rgba(0,0,0,.45);
+
+    color:white;
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:12px;
+
+    font-size:15px;
+
+}
+
+
+
+input {
+
+    flex:1;
+
+}
+
+
+
+.filter-row {
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:15px;
+
+}
+
+
+
+select {
+
+    flex:1;
+
+}
+
+
+
+
+
+button {
+
+    background:
+    linear-gradient(135deg,#00c6ff,#7b2cff);
+
+    color:white;
+
+    border:none;
+
+    padding:12px 20px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+
+
+button:hover {
+
+    transform:
+    translateY(-3px);
+
+    box-shadow:
+    0 8px 25px rgba(0,200,255,.4);
+
+}
+
+
+
+
+
+.now-playing {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+
+
+.station-icon {
+
+    width:85px;
+
+    height:85px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:45px;
+
+    background:
+    rgba(255,255,255,.1);
+
+}
+
+
+
+.station-details p {
+
+    color:#00eaff;
+
+}
+
+
+
+
+
+.controls {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.volume-control {
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    flex:1;
+
+}
+
+
+
+.volume-control input {
+
+    width:100%;
+
+}
+
+
+
+
+
+.section-header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:15px;
+
+}
+
+
+
+
+
+.radio-grid {
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(260px,1fr));
+
+    gap:15px;
+
+}
+
+
+
+
+
+.radio-card {
+
+    background:
+    rgba(255,255,255,.08);
+
+    border-radius:18px;
+
+    padding:16px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    border:
+    1px solid transparent;
+
+    position:relative;
+
+}
+
+
+
+.radio-card:hover {
+
+    transform:
+    scale(1.03);
+
+    background:
+    rgba(255,255,255,.15);
+
+    border-color:#00eaff;
+
+}
+
+
+
+.radio-card h3 {
+
+    margin:0 40px 10px 0;
+
+}
+
+
+
+.radio-card p {
+
+    margin:5px 0;
+
+    color:#bbb;
+
+    font-size:14px;
+
+}
+
+
+
+.favorite-button {
+
+    position:absolute;
+
+    top:12px;
+
+    right:12px;
+
+    width:35px;
+
+    height:35px;
+
+    padding:0;
+
+    border-radius:50%;
+
+    background:
+    rgba(255,255,255,.15);
+
+}
+
+
+
+.favorite-button.active {
+
+    background:
+    linear-gradient(135deg,#ffd700,#ff8c00);
+
+}
+
+
+
+
+
+.hidden {
+
+    display:none;
+
+}
+
+
+
+
+
+@keyframes fadeIn {
+
+    from {
+
+        opacity:0;
+
+        transform:
+        translateY(-20px);
+
+    }
+
+
+    to {
+
+        opacity:1;
+
+        transform:
+        translateY(0);
+
+    }
+
+}
+
+
+
+
+
+@media(max-width:600px) {
+
+
+    .app {
+
+        margin:15px auto;
+
+        padding:10px;
+
+    }
+
+
+
+    .header h1 {
+
+        font-size:32px;
+
+    }
+
+
+
+    .search-row,
+    .filter-row {
+
+        flex-direction:column;
+
+    }
+
+
+
+    .now-playing {
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+
+
+    .section-header {
+
+        flex-direction:column;
+
+    }
+
+
+}
