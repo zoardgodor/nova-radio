@@ -37,7 +37,7 @@ radio-player/
 
 
 ## Website:
-
+https://zoardgodor.github.io/nova-radio/
 
 ## API
 
