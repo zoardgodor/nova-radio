@@ -2,6 +2,11 @@
     box-sizing: border-box;
 }
 
+html,
+body {
+    overflow-x:hidden;
+    width:100%;
+}
 
 body {
 
@@ -119,7 +124,10 @@ body {
 .sidebar-content {
 
     margin-top:30px;
-
+    height:calc(100vh - 100px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    
 }
 
 
@@ -204,8 +212,10 @@ body {
 
 }
 
-
-
+.favorites-dropdown {
+    max-height:300px;
+    overflow-y:auto;
+}
 
 
 .menu-button {
