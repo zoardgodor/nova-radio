@@ -10,7 +10,7 @@ const translations = {
 
         language: "Language",
 
-        subtitle: "Modern Internet Radio Player",
+        subtitle: "Online Internet Radio Player",
 
         search: "Search",
 
@@ -53,7 +53,7 @@ const translations = {
 
         language: "Nyelv",
 
-        subtitle: "Modern internet rádió lejátszó",
+        subtitle: "Online rádió lejátszó",
 
         search: "Keresés",
 
