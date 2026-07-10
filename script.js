@@ -53,6 +53,8 @@ let stations = [];
 
 let currentStation = null;
 
+let currentStreamUrl = null;
+
 let userPaused = false;
 
 let currentStatus = "ready";
@@ -78,6 +80,21 @@ localStorage.getItem("language") || "en";
 
 audio.volume =
 Number(localStorage.getItem("volume")) || 0.7;
+
+
+function getSecureUrl(url){
+
+    if(!url){
+        return null;
+    }
+
+
+    return url.replace(
+        /^http:\/\//i,
+        "https://"
+    );
+
+}
 
 
 
@@ -468,8 +485,15 @@ async function loadStations(reset=true){
     await response.json();
 
 
+    const validResult =
+    result.filter(
+        station =>
+        station.url_resolved
+    );
+
+
     stations =
-    stations.concat(result);
+    stations.concat(validResult);
 
 
     displayStations();
@@ -505,6 +529,15 @@ function createCard(station){
     <p>${station.country || "Unknown country"}</p>
 
     <p>${station.tags || "No genre"}</p>
+
+    ${
+    station.url_resolved &&
+    station.url_resolved.startsWith("http://")
+    ?
+    '<p class="http-warning">⚠️ HTTP stream</p>'
+    :
+    '<p class="https-warning">🔒 HTTPS stream</p>'
+    }
 
     `;
 
@@ -593,7 +626,11 @@ async function fetchNowPlayingMetadata(station){
     try{
 
         const streamUrl =
-        new URL(station.url_resolved);
+        new URL(
+            getSecureUrl(
+                station.url_resolved
+            )
+        );
 
 
         const statusUrl =
@@ -779,8 +816,24 @@ function setStatus(text,type){
 
     currentStatus = type;
 
+
+    let protocolText = "";
+
+    if(currentStreamUrl){
+
+        protocolText =
+        currentStreamUrl.startsWith("https://")
+        ?
+        " 🔒 HTTPS"
+        :
+        " ⚠️ HTTP";
+
+    }
+
+
     playerStatus.textContent =
-    text;
+    text + protocolText;
+
 
     playerStatus.className =
     "status " + type;
@@ -798,18 +851,22 @@ function playStation(station){
 
     }
 
-    currentStation =
-    station;
+    currentStation = station;
+
+    retryIndex = 0;
 
 
-    retryIndex=0;
+    let originalUrl = station.url_resolved;
+
+    let streamUrl = getSecureUrl(originalUrl);
+
+    currentStreamUrl = streamUrl;
+
+    audio.src = streamUrl;
 
 
-    audio.src =
-    station.url_resolved;
-
-
-    audio.play().catch(()=>{
+    audio.play()
+    .catch(()=>{
 
         setStatus(
             translations[language].paused,
@@ -842,7 +899,6 @@ function playStation(station){
     updateMediaSession(station,null);
 
 }
-
 
 
 function retryConnection(){
@@ -887,8 +943,13 @@ function retryConnection(){
     retryTimer =
     setTimeout(()=>{
 
-        audio.src =
-        currentStation.url_resolved;
+        currentStreamUrl =
+        getSecureUrl(
+            currentStation.url_resolved
+        );
+
+
+        audio.src = currentStreamUrl;
 
         audio.play()
         .then(()=>{
@@ -969,8 +1030,33 @@ retryConnection
 
 audio.addEventListener(
 "error",
-retryConnection
-);
+()=>{
+
+    if(
+        currentStreamUrl &&
+        currentStreamUrl.startsWith("https://")
+    ){
+
+        currentStreamUrl =
+        currentStation.url_resolved;
+
+        audio.src =
+        currentStreamUrl;
+
+        setStatus(
+            translations[language].playing,
+            "playing"
+        );
+
+        audio.play();
+
+        return;
+
+    }
+
+    retryConnection();
+
+});
 
 
 

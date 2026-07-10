@@ -70,7 +70,11 @@ const translations = {
 
         sleepTimerFinished: "Playback stopped by sleep timer",
 
-        minutesSuffix: "min"
+        minutesSuffix: "min",
+
+        insecureStream: "This station is only available over HTTP. It may not be secure. Do you want to continue?",
+
+        httpsRetry: "Trying secure HTTPS connection..."
 
     },
 
@@ -145,7 +149,11 @@ const translations = {
 
         sleepTimerFinished: "A lejátszás leállt az elalváskapcsoló miatt",
 
-        minutesSuffix: "perc"
+        minutesSuffix: "perc",
+
+        insecureStream: "Ez a rádió csak HTTP kapcsolaton érhető el, ami nem biztonságos. Szeretnéd így is lejátszani?",
+
+        httpsRetry: "Biztonságos HTTPS kapcsolat próbálása..."
 
     }
 
