@@ -15,26 +15,92 @@ const loading = document.getElementById("loading");
 
 const stationName = document.getElementById("stationName");
 const nowPlaying = document.getElementById("nowPlaying");
+const playerStatus = document.getElementById("playerStatus");
 
 const playButton = document.getElementById("playButton");
 const pauseButton = document.getElementById("pauseButton");
 
 const volumeSlider = document.getElementById("volumeSlider");
 
-const showFavoritesButton = document.getElementById("showFavoritesButton");
+const favoritesToggle = document.getElementById("favoritesToggle");
+
+const favoritesDropdown = document.getElementById("favoritesDropdown");
 
 const loadMoreButton = document.getElementById("loadMoreButton");
 
+const menuButton = document.getElementById("menuButton");
+const closeMenuButton = document.getElementById("closeMenuButton");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+const englishButton = document.getElementById("englishButton");
+const hungarianButton = document.getElementById("hungarianButton");
+
 
 let stations = [];
+
 let currentStation = null;
-let showingFavorites = false;
+
+let userPaused = false;
+
+let currentStatus = "ready";
 
 let page = 0;
+
 const pageSize = 100;
 
 
-audio.volume = 0.7;
+let retryTimes = [3000,5000,10000,15000,20000,30000];
+
+let retryIndex = 0;
+
+let retryTimer = null;
+
+let language =
+localStorage.getItem("language") || "en";
+
+
+audio.volume =
+Number(localStorage.getItem("volume")) || 0.7;
+
+
+
+function translatePage(){
+
+    document.querySelectorAll("[data-i18n]")
+    .forEach(element=>{
+
+        const key =
+        element.dataset.i18n;
+
+        if(
+            translations[language] &&
+            translations[language][key]
+        ){
+
+            element.textContent =
+            translations[language][key];
+
+        }
+
+    });
+
+}
+
+
+
+function setLanguage(lang){
+
+    language = lang;
+
+    localStorage.setItem(
+        "language",
+        lang
+    );
+
+    translatePage();
+
+}
 
 
 
@@ -73,20 +139,36 @@ function isFavorite(uuid){
 
 function toggleFavorite(station){
 
-    let favorites = getFavorites();
+    let favorites =
+    getFavorites();
 
 
-    if(
-        isFavorite(station.stationuuid)
-    ){
+    if(isFavorite(station.stationuuid)){
 
-        favorites =
-        favorites.filter(
-            item =>
-            item.stationuuid !== station.stationuuid
+        const confirmed =
+        confirm(
+            language === "hu"
+            ?
+            "Biztosan törlöd a kedvencek közül?"
+            :
+            "Are you sure you want to remove this station from favorites?"
         );
 
-    }
+
+        if(!confirmed){
+
+            return;
+
+        }
+
+
+    favorites =
+    favorites.filter(
+        item =>
+        item.stationuuid !== station.stationuuid
+    );
+
+}
 
     else {
 
@@ -132,14 +214,11 @@ async function loadCountries(){
             const option =
             document.createElement("option");
 
-
             option.value =
             country.name;
 
-
             option.textContent =
             country.name;
-
 
             countryFilter.appendChild(option);
 
@@ -178,14 +257,11 @@ async function loadGenres(){
             const option =
             document.createElement("option");
 
-
             option.value =
             tag.name;
 
-
             option.textContent =
             tag.name;
-
 
             genreFilter.appendChild(option);
 
@@ -196,22 +272,20 @@ async function loadGenres(){
 
 
 
-async function loadStations(reset = true){
+async function loadStations(reset=true){
 
     if(reset){
 
-        page = 0;
+        page=0;
 
-        stations = [];
+        stations=[];
 
-        radioList.innerHTML = "";
+        radioList.innerHTML="";
 
     }
 
 
-
     loading.classList.remove("hidden");
-
 
 
     let url =
@@ -220,7 +294,7 @@ async function loadStations(reset = true){
     +
     "&limit=" + pageSize
     +
-    "&offset=" + (page * pageSize);
+    "&offset=" + (page*pageSize);
 
 
 
@@ -229,11 +303,10 @@ async function loadStations(reset = true){
         url +=
         "&name=" +
         encodeURIComponent(
-            searchInput.value.trim()
+            searchInput.value
         );
 
     }
-
 
 
     if(countryFilter.value){
@@ -247,7 +320,6 @@ async function loadStations(reset = true){
     }
 
 
-
     if(genreFilter.value){
 
         url +=
@@ -259,24 +331,19 @@ async function loadStations(reset = true){
     }
 
 
-
     const response =
     await fetch(url);
-
 
 
     const result =
     await response.json();
 
 
-
     stations =
     stations.concat(result);
 
 
-
     displayStations();
-
 
 
     page++;
@@ -298,21 +365,9 @@ function createCard(station){
     "radio-card";
 
 
-
-    const favorite =
-    isFavorite(
-        station.stationuuid
-    )
-    ?
-    "active"
-    :
-    "";
-
-
-
     card.innerHTML = `
 
-    <button class="favorite-button ${favorite}">
+    <button class="favorite-button ${isFavorite(station.stationuuid) ? "active":""}">
     ⭐
     </button>
 
@@ -329,7 +384,6 @@ function createCard(station){
     card.onclick =
     event=>{
 
-
         if(
             event.target.classList.contains(
                 "favorite-button"
@@ -345,26 +399,20 @@ function createCard(station){
 
         playStation(station);
 
-    };
+        sidebar.classList.remove("open");
 
+        overlay.classList.remove("show");
+
+    };
 
 
     return card;
 
 }
 
-
-
 function displayStations(){
 
-    if(showingFavorites){
-
-        return;
-
-    }
-
-
-    radioList.innerHTML = "";
+    radioList.innerHTML="";
 
 
     stations.forEach(
@@ -380,14 +428,24 @@ function displayStations(){
 }
 
 
-
 function displayFavorites(){
 
-    favoritesList.innerHTML = "";
+    favoritesList.innerHTML="";
+
+    const favorites = getFavorites();
 
 
-    getFavorites()
-    .forEach(
+    if(favorites.length === 0){
+
+        favoritesList.innerHTML =
+        "<p>No favorites</p>";
+
+        return;
+
+    }
+
+
+    favorites.forEach(
         station=>{
 
             favoritesList.appendChild(
@@ -401,18 +459,48 @@ function displayFavorites(){
 
 
 
+function setStatus(text,type){
+
+    currentStatus = type;
+
+    playerStatus.textContent =
+    text;
+
+    playerStatus.className =
+    "status " + type;
+
+}
+
+
+
 function playStation(station){
+
+    if(retryTimer){
+
+        clearTimeout(retryTimer);
+        retryTimer = null;
+
+    }
 
     currentStation =
     station;
+
+
+    retryIndex=0;
 
 
     audio.src =
     station.url_resolved;
 
 
-    audio.play();
+    audio.play().catch(()=>{
 
+        setStatus(
+            translations[language].paused,
+            "paused"
+        );
+
+    });
 
 
     stationName.textContent =
@@ -422,14 +510,188 @@ function playStation(station){
     nowPlaying.textContent =
     "Streaming";
 
+
+    setStatus(
+        translations[language].playing,
+        "playing"
+    );
+
 }
 
 
 
-playButton.onclick =
+function retryConnection(){
+
+  if(retryTimer){
+        return;
+    }
+
+    if(!currentStation){
+        return;
+    }
+
+
+
+    if(retryIndex >= retryTimes.length){
+
+        retryTimer = null;
+
+        setStatus(
+            translations[language].connectionLost,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const time =
+    retryTimes[retryIndex];
+
+
+    setStatus(
+        translations[language].retrying +
+        " " +
+        (time/1000) +
+        "s",
+        "buffering"
+    );
+
+
+    retryTimer =
+    setTimeout(()=>{
+
+        audio.src =
+        currentStation.url_resolved;
+
+        audio.play()
+        .then(()=>{
+
+            retryIndex = 0;
+            clearTimeout(retryTimer);
+            retryTimer = null;
+
+        })
+        .catch(()=>{
+
+            retryIndex++;
+            retryTimer = null;
+            retryConnection();
+
+        });
+
+    },time);
+
+}
+
+
+
+audio.addEventListener(
+"waiting",
 ()=>{
 
-    audio.play();
+    setStatus(
+        translations[language].buffering,
+        "buffering"
+    );
+
+});
+
+
+audio.addEventListener(
+"playing",
+()=>{
+
+    retryIndex = 0;
+
+    if(retryTimer){
+
+        clearTimeout(retryTimer);
+        retryTimer = null;
+
+    }
+
+    setStatus(
+        translations[language].playing,
+        "playing"
+    );
+
+});
+
+
+audio.addEventListener(
+"pause",
+()=>{
+
+    if(userPaused){
+
+        setStatus(
+            translations[language].paused,
+            "paused"
+        );
+
+    }
+
+});
+
+
+audio.addEventListener(
+"stalled",
+retryConnection
+);
+
+
+audio.addEventListener(
+"error",
+retryConnection
+);
+
+
+
+window.addEventListener(
+"offline",
+()=>{
+
+    retryConnection();
+
+});
+
+
+window.addEventListener(
+"online",
+()=>{
+
+    if(currentStation){
+
+        retryIndex=0;
+
+        retryConnection();
+
+    }
+
+});
+
+
+
+    playButton.onclick =
+    ()=>{
+
+        userPaused = false;
+        retryIndex = 0;
+
+        if(retryTimer){
+
+            clearTimeout(retryTimer);
+            retryTimer = null;
+
+        }
+
+        audio.play().catch(error=>{
+
+            console.log(error);
+
+    });
 
 };
 
@@ -438,6 +700,7 @@ playButton.onclick =
 pauseButton.onclick =
 ()=>{
 
+    userPaused = true;
     audio.pause();
 
 };
@@ -450,6 +713,11 @@ volumeSlider.oninput =
     audio.volume =
     volumeSlider.value;
 
+    localStorage.setItem(
+        "volume",
+        volumeSlider.value
+    );
+
 };
 
 
@@ -457,7 +725,6 @@ volumeSlider.oninput =
 searchButton.onclick =
 ()=>{
 
-    showingFavorites = false;
 
     loadStations(true);
 
@@ -465,26 +732,21 @@ searchButton.onclick =
 
 
 
-searchInput.addEventListener(
-"keydown",
+searchInput.onkeydown =
 event=>{
 
-    if(event.key === "Enter"){
-
-        showingFavorites = false;
+    if(event.key==="Enter"){
 
         loadStations(true);
 
     }
 
-});
+};
 
 
 
 countryFilter.onchange =
 ()=>{
-
-    showingFavorites = false;
 
     loadStations(true);
 
@@ -494,8 +756,6 @@ countryFilter.onchange =
 
 genreFilter.onchange =
 ()=>{
-
-    showingFavorites = false;
 
     loadStations(true);
 
@@ -512,34 +772,76 @@ loadMoreButton.onclick =
 
 
 
-showFavoritesButton.onclick =
+favoritesToggle.onclick =
 ()=>{
 
-    showingFavorites =
-    !showingFavorites;
+    favoritesDropdown.classList.toggle(
+        "hidden"
+    );
 
-
-    if(showingFavorites){
-
-        radioList.innerHTML = "";
-
-        showFavoritesButton.textContent =
-        "Show Stations";
-
-    }
-
-    else {
-
-        showFavoritesButton.textContent =
-        "⭐ Show Favorites";
-
-        displayStations();
-
-    }
+    displayFavorites();
 
 };
 
 
+
+menuButton.onclick =
+()=>{
+
+    sidebar.classList.add("open");
+
+    overlay.classList.add("show");
+
+};
+
+
+
+closeMenuButton.onclick =
+()=>{
+
+    sidebar.classList.remove("open");
+
+    overlay.classList.remove("show");
+
+};
+
+
+
+overlay.onclick =
+()=>{
+
+    sidebar.classList.remove("open");
+
+    overlay.classList.remove("show");
+
+};
+
+
+
+englishButton.onclick =
+()=>{
+
+    setLanguage("en");
+
+};
+
+
+
+hungarianButton.onclick =
+()=>{
+
+    setLanguage("hu");
+
+};
+
+
+
+volumeSlider.value =
+audio.volume;
+
+
+
+translatePage();
 
 loadCountries();
 
