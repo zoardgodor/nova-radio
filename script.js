@@ -48,6 +48,8 @@ const clearRecentButton = document.getElementById("clearRecentButton");
 
 const sleepTimerSelect = document.getElementById("sleepTimerSelect");
 
+const stopButton = document.getElementById("stopButton");
+
 
 let stations = [];
 
@@ -67,12 +69,17 @@ let nowPlayingTimer = null;
 
 let sleepTimer = null;
 
+let httpsTried = false;
+
+let httpsFallbackTimer = null;
 
 let retryTimes = [3000,5000,10000,15000,20000,30000];
 
 let retryIndex = 0;
 
 let retryTimer = null;
+
+let manualStop = false;
 
 let language =
 localStorage.getItem("language") || "en";
@@ -627,9 +634,7 @@ async function fetchNowPlayingMetadata(station){
 
         const streamUrl =
         new URL(
-            getSecureUrl(
-                station.url_resolved
-            )
+            currentStreamUrl || station.url_resolved
         );
 
 
@@ -844,6 +849,16 @@ function setStatus(text,type){
 
 function playStation(station){
 
+    manualStop = false;
+
+    if(httpsFallbackTimer){
+
+        clearTimeout(httpsFallbackTimer);
+        httpsFallbackTimer = null;
+
+    }
+
+
     if(retryTimer){
 
         clearTimeout(retryTimer);
@@ -853,16 +868,57 @@ function playStation(station){
 
     currentStation = station;
 
+    localStorage.setItem(
+        "lastStation",
+        JSON.stringify(station)
+    );
+
     retryIndex = 0;
 
 
     let originalUrl = station.url_resolved;
 
-    let streamUrl = getSecureUrl(originalUrl);
+    httpsTried = false;
 
-    currentStreamUrl = streamUrl;
+    if(originalUrl.startsWith("http://")){
 
-    audio.src = streamUrl;
+        currentStreamUrl =
+        originalUrl.replace(
+            /^http:\/\//i,
+            "https://"
+        );
+
+        httpsFallbackTimer =
+        setTimeout(()=>{
+
+            if(audio.readyState < 3 && !httpsTried){
+
+                httpsTried = true;
+
+                currentStreamUrl = originalUrl;
+
+                audio.src = originalUrl;
+
+                setStatus(
+                    "⚠️ HTTP használva (HTTPS nem működött)",
+                    "playing"
+                );
+
+                audio.play();
+
+            }
+
+        },8000);
+
+    }
+    else {
+
+        currentStreamUrl = originalUrl;
+
+    }
+
+
+    audio.src = currentStreamUrl;
 
 
     audio.play()
@@ -902,6 +958,11 @@ function playStation(station){
 
 
 function retryConnection(){
+
+    if(manualStop){
+        return;
+    }
+
 
   if(retryTimer){
         return;
@@ -948,7 +1009,6 @@ function retryConnection(){
             currentStation.url_resolved
         );
 
-
         audio.src = currentStreamUrl;
 
         audio.play()
@@ -989,6 +1049,14 @@ audio.addEventListener(
 "playing",
 ()=>{
 
+    if(httpsFallbackTimer){
+
+        clearTimeout(httpsFallbackTimer);
+        httpsFallbackTimer = null;
+
+    }
+
+
     retryIndex = 0;
 
     if(retryTimer){
@@ -997,6 +1065,7 @@ audio.addEventListener(
         retryTimer = null;
 
     }
+
 
     setStatus(
         translations[language].playing,
@@ -1024,37 +1093,26 @@ audio.addEventListener(
 
 audio.addEventListener(
 "stalled",
-retryConnection
-);
+()=>{
+
+    if(!manualStop){
+
+        retryConnection();
+
+    }
+
+});
 
 
 audio.addEventListener(
 "error",
 ()=>{
 
-    if(
-        currentStreamUrl &&
-        currentStreamUrl.startsWith("https://")
-    ){
+    if(!manualStop){
 
-        currentStreamUrl =
-        currentStation.url_resolved;
-
-        audio.src =
-        currentStreamUrl;
-
-        setStatus(
-            translations[language].playing,
-            "playing"
-        );
-
-        audio.play();
-
-        return;
+        retryConnection();
 
     }
-
-    retryConnection();
 
 });
 
@@ -1064,7 +1122,11 @@ window.addEventListener(
 "offline",
 ()=>{
 
-    retryConnection();
+    if(!manualStop){
+
+        retryConnection();
+
+    }
 
 });
 
@@ -1086,29 +1148,60 @@ window.addEventListener(
 
 
     playButton.onclick =
-    ()=>{
+()=>{
 
-        userPaused = false;
-        retryIndex = 0;
+    manualStop = false;
 
-        if(retryTimer){
+    userPaused = false;
+    retryIndex = 0;
 
-            clearTimeout(retryTimer);
-            retryTimer = null;
+
+    if(!currentStation){
+
+        const saved =
+        localStorage.getItem("lastStation");
+
+
+        if(saved){
+
+            currentStation =
+            JSON.parse(saved);
+
+            stationName.textContent =
+            currentStation.name;
+
+        }
+        else{
+
+            return;
 
         }
 
-        audio.play().catch(error=>{
+    }
 
-            console.log(error);
+
+    if(!currentStreamUrl){
+
+        currentStreamUrl =
+        getSecureUrl(
+            currentStation.url_resolved
+        );
+
+        audio.src =
+        currentStreamUrl;
+
+    }
+
+
+    audio.play()
+    .catch(error=>{
+
+        console.log(error);
 
     });
 
-        if(currentStation){
 
-            startNowPlayingPolling();
-
-        }
+    startNowPlayingPolling();
 
 };
 
@@ -1121,6 +1214,53 @@ pauseButton.onclick =
     audio.pause();
 
     stopNowPlayingPolling();
+
+};
+
+
+stopButton.onclick =
+()=>{
+
+    manualStop = true;
+
+    userPaused = true;
+
+    if(retryTimer){
+
+        clearTimeout(retryTimer);
+        retryTimer = null;
+
+    }
+
+    if(httpsFallbackTimer){
+
+        clearTimeout(httpsFallbackTimer);
+        httpsFallbackTimer = null;
+
+    }
+
+
+    audio.pause();
+
+    audio.removeAttribute("src");
+
+    audio.load();
+
+
+    currentStreamUrl = null;
+
+
+    stopNowPlayingPolling();
+
+
+    setStatus(
+        translations[language].stopped || "Stopped",
+        "ready"
+    );
+
+
+    nowPlaying.textContent =
+    translations[language].nothingPlaying || "Nothing playing";
 
 };
 
@@ -1410,6 +1550,20 @@ loadStations();
 displayFavorites();
 
 displayRecent();
+
+const savedStation =
+localStorage.getItem("lastStation");
+
+
+if(savedStation){
+
+    currentStation =
+    JSON.parse(savedStation);
+
+    stationName.textContent =
+    currentStation.name;
+
+}
 
 if("serviceWorker" in navigator){
 

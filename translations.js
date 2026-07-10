@@ -40,6 +40,8 @@ const translations = {
 
         ready: "Ready",
 
+        nothingPlaying: "Nothing playing",
+
         trackLabel: "Now Playing",
 
         noTrackInfo: "No track info available",
@@ -118,6 +120,8 @@ const translations = {
         connectionLost: "Megszakadt a kapcsolat. Ellenőrizd az internetkapcsolatot és próbáld újra.",
 
         ready: "Kész",
+
+        nothingPlaying: "Nincs lejátszás",
 
         trackLabel: "Éppen szól",
 
