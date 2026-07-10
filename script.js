@@ -850,3 +850,22 @@ loadGenres();
 loadStations();
 
 displayFavorites();
+
+if("serviceWorker" in navigator){
+
+    navigator.serviceWorker.register("sw.js")
+    .then(()=>{
+
+        console.log("Service Worker registered");
+
+    })
+    .catch(error=>{
+
+        console.log(
+            "Service Worker error:",
+            error
+        );
+
+    });
+
+}
