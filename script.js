@@ -36,6 +36,18 @@ const overlay = document.getElementById("overlay");
 const englishButton = document.getElementById("englishButton");
 const hungarianButton = document.getElementById("hungarianButton");
 
+const trackInfo = document.getElementById("trackInfo");
+
+const recentList = document.getElementById("recentList");
+
+const recentToggle = document.getElementById("recentToggle");
+
+const recentDropdown = document.getElementById("recentDropdown");
+
+const clearRecentButton = document.getElementById("clearRecentButton");
+
+const sleepTimerSelect = document.getElementById("sleepTimerSelect");
+
 
 let stations = [];
 
@@ -48,6 +60,10 @@ let currentStatus = "ready";
 let page = 0;
 
 const pageSize = 100;
+
+let nowPlayingTimer = null;
+
+let sleepTimer = null;
 
 
 let retryTimes = [3000,5000,10000,15000,20000,30000];
@@ -99,6 +115,16 @@ function setLanguage(lang){
     );
 
     translatePage();
+
+    displayRecent();
+
+    displayFavorites();
+
+    if(currentStation){
+
+        updateNowPlayingTrack();
+
+    }
 
 }
 
@@ -182,6 +208,109 @@ function toggleFavorite(station){
     displayStations();
 
     displayFavorites();
+
+}
+
+
+
+function getRecent(){
+
+    return JSON.parse(
+        localStorage.getItem("radioRecent") || "[]"
+    );
+
+}
+
+
+
+function saveRecent(list){
+
+    localStorage.setItem(
+        "radioRecent",
+        JSON.stringify(list)
+    );
+
+}
+
+
+
+function addRecent(station){
+
+    let recent =
+    getRecent()
+    .filter(
+        item =>
+        item.stationuuid !== station.stationuuid
+    );
+
+
+    recent.unshift(station);
+
+
+    if(recent.length > 10){
+
+        recent = recent.slice(0,10);
+
+    }
+
+
+    saveRecent(recent);
+
+    displayRecent();
+
+}
+
+
+
+function displayRecent(){
+
+    recentList.innerHTML="";
+
+    const recent = getRecent();
+
+
+    if(recent.length === 0){
+
+        recentList.innerHTML =
+        `<p>${translations[language].noRecent}</p>`;
+
+        return;
+
+    }
+
+
+    recent.forEach(
+        station=>{
+
+            recentList.appendChild(
+                createCard(station)
+            );
+
+        }
+    );
+
+}
+
+
+
+function clearRecent(){
+
+    const confirmed =
+    confirm(
+        translations[language].confirmClearHistory
+    );
+
+
+    if(!confirmed){
+
+        return;
+
+    }
+
+
+    saveRecent([]);
+
+    displayRecent();
 
 }
 
@@ -459,6 +588,193 @@ function displayFavorites(){
 
 
 
+async function fetchNowPlayingMetadata(station){
+
+    try{
+
+        const streamUrl =
+        new URL(station.url_resolved);
+
+
+        const statusUrl =
+        streamUrl.origin + "/status-json.xsl";
+
+
+        const response =
+        await fetch(statusUrl,{cache:"no-store"});
+
+
+        if(!response.ok){
+
+            throw new Error("no metadata");
+
+        }
+
+
+        const data =
+        await response.json();
+
+
+        let sources =
+        data.icestats &&
+        data.icestats.source;
+
+
+        if(!sources){
+
+            throw new Error("no metadata");
+
+        }
+
+
+        if(!Array.isArray(sources)){
+
+            sources = [sources];
+
+        }
+
+
+        const mountPath =
+        streamUrl.pathname;
+
+
+        let match =
+        sources.find(
+            source =>
+            source.listenurl &&
+            source.listenurl.indexOf(mountPath) !== -1
+        );
+
+
+        if(!match){
+
+            match = sources[0];
+
+        }
+
+
+        const title =
+        match &&
+        (match.title || match.yp_currently_playing);
+
+
+        if(!title){
+
+            throw new Error("no metadata");
+
+        }
+
+
+        return title;
+
+    }
+
+    catch(error){
+
+        return null;
+
+    }
+
+}
+
+
+
+function updateMediaSession(station,track){
+
+    if(!("mediaSession" in navigator)){
+
+        return;
+
+    }
+
+
+    navigator.mediaSession.metadata =
+    new MediaMetadata({
+        title: track || station.name,
+        artist: station.name,
+        album: station.country || "",
+        artwork: station.favicon ?
+        [{src:station.favicon,sizes:"512x512",type:"image/png"}] :
+        []
+    });
+
+}
+
+
+
+async function updateNowPlayingTrack(){
+
+    if(!currentStation){
+
+        return;
+
+    }
+
+
+    const track =
+    await fetchNowPlayingMetadata(currentStation);
+
+
+    if(track){
+
+        trackInfo.textContent =
+        translations[language].trackLabel + ": " + track;
+
+        trackInfo.classList.remove("hidden");
+
+    }
+
+    else {
+
+        trackInfo.classList.add("hidden");
+
+    }
+
+
+    updateMediaSession(currentStation,track);
+
+}
+
+
+
+function startNowPlayingPolling(){
+
+    if(nowPlayingTimer){
+
+        clearInterval(nowPlayingTimer);
+
+    }
+
+
+    updateNowPlayingTrack();
+
+
+    nowPlayingTimer =
+    setInterval(
+        updateNowPlayingTrack,
+        20000
+    );
+
+}
+
+
+
+function stopNowPlayingPolling(){
+
+    if(nowPlayingTimer){
+
+        clearInterval(nowPlayingTimer);
+        nowPlayingTimer = null;
+
+    }
+
+
+    trackInfo.classList.add("hidden");
+
+}
+
+
+
 function setStatus(text,type){
 
     currentStatus = type;
@@ -515,6 +831,15 @@ function playStation(station){
         translations[language].playing,
         "playing"
     );
+
+
+    addRecent(station);
+
+
+    startNowPlayingPolling();
+
+
+    updateMediaSession(station,null);
 
 }
 
@@ -693,6 +1018,12 @@ window.addEventListener(
 
     });
 
+        if(currentStation){
+
+            startNowPlayingPolling();
+
+        }
+
 };
 
 
@@ -702,6 +1033,8 @@ pauseButton.onclick =
 
     userPaused = true;
     audio.pause();
+
+    stopNowPlayingPolling();
 
 };
 
@@ -772,6 +1105,123 @@ loadMoreButton.onclick =
 
 
 
+sleepTimerSelect.onchange =
+()=>{
+
+    if(sleepTimer){
+
+        clearTimeout(sleepTimer);
+        sleepTimer = null;
+
+    }
+
+
+    const minutes =
+    Number(sleepTimerSelect.value);
+
+
+    if(minutes === 0){
+
+        setStatus(
+            translations[language].sleepTimerCancelled,
+            currentStatus
+        );
+
+        return;
+
+    }
+
+
+    sleepTimer =
+    setTimeout(()=>{
+
+        userPaused = true;
+        audio.pause();
+        stopNowPlayingPolling();
+
+        setStatus(
+            translations[language].sleepTimerFinished,
+            "paused"
+        );
+
+        sleepTimer = null;
+
+        sleepTimerSelect.value = "0";
+
+    },minutes * 60 * 1000);
+
+
+    setStatus(
+        translations[language].sleepTimerSet +
+        " " +
+        minutes +
+        " " +
+        translations[language].minutesSuffix,
+        currentStatus
+    );
+
+};
+
+
+
+document.addEventListener(
+"keydown",
+event=>{
+
+    if(
+        event.code !== "Space" ||
+        event.target === searchInput
+    ){
+
+        return;
+
+    }
+
+
+    event.preventDefault();
+
+
+    if(userPaused || audio.paused){
+
+        playButton.onclick();
+
+    }
+
+    else {
+
+        pauseButton.onclick();
+
+    }
+
+});
+
+
+
+if("mediaSession" in navigator){
+
+    navigator.mediaSession.setActionHandler(
+        "play",
+        ()=>{
+
+            playButton.onclick();
+
+        }
+    );
+
+
+    navigator.mediaSession.setActionHandler(
+        "pause",
+        ()=>{
+
+            pauseButton.onclick();
+
+        }
+    );
+
+}
+
+
+
 favoritesToggle.onclick =
 ()=>{
 
@@ -780,6 +1230,28 @@ favoritesToggle.onclick =
     );
 
     displayFavorites();
+
+};
+
+
+
+recentToggle.onclick =
+()=>{
+
+    recentDropdown.classList.toggle(
+        "hidden"
+    );
+
+    displayRecent();
+
+};
+
+
+
+clearRecentButton.onclick =
+()=>{
+
+    clearRecent();
 
 };
 
@@ -850,6 +1322,8 @@ loadGenres();
 loadStations();
 
 displayFavorites();
+
+displayRecent();
 
 if("serviceWorker" in navigator){
 

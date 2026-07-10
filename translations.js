@@ -38,7 +38,39 @@ const translations = {
 
         connectionLost: "Connection lost. Check your internet connection and retry.",
 
-        ready: "Ready"
+        ready: "Ready",
+
+        trackLabel: "Now Playing",
+
+        noTrackInfo: "No track info available",
+
+        recentlyPlayed: "Recently Played",
+
+        noRecent: "No recently played stations",
+
+        clearHistory: "Clear History",
+
+        confirmClearHistory: "Are you sure you want to clear your listening history?",
+
+        sleepTimer: "Sleep Timer",
+
+        sleepTimerOff: "Off",
+
+        min15: "15 min",
+
+        min30: "30 min",
+
+        min45: "45 min",
+
+        min60: "60 min",
+
+        sleepTimerSet: "Sleep timer set for",
+
+        sleepTimerCancelled: "Sleep timer cancelled",
+
+        sleepTimerFinished: "Playback stopped by sleep timer",
+
+        minutesSuffix: "min"
 
     },
 
@@ -81,7 +113,39 @@ const translations = {
 
         connectionLost: "Megszakadt a kapcsolat. Ellenőrizd az internetkapcsolatot és próbáld újra.",
 
-        ready: "Kész"
+        ready: "Kész",
+
+        trackLabel: "Éppen szól",
+
+        noTrackInfo: "Nincs elérhető szám információ",
+
+        recentlyPlayed: "Legutóbb hallgatott",
+
+        noRecent: "Nincs legutóbb hallgatott rádió",
+
+        clearHistory: "Előzmények törlése",
+
+        confirmClearHistory: "Biztosan törlöd a hallgatási előzményeket?",
+
+        sleepTimer: "Elalváskapcsoló",
+
+        sleepTimerOff: "Kikapcsolva",
+
+        min15: "15 perc",
+
+        min30: "30 perc",
+
+        min45: "45 perc",
+
+        min60: "60 perc",
+
+        sleepTimerSet: "Elalváskapcsoló beállítva ennyi időre:",
+
+        sleepTimerCancelled: "Elalváskapcsoló törölve",
+
+        sleepTimerFinished: "A lejátszás leállt az elalváskapcsoló miatt",
+
+        minutesSuffix: "perc"
 
     }
 

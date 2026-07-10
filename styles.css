@@ -217,6 +217,36 @@ body {
     overflow-y:auto;
 }
 
+.recent-dropdown {
+    max-height:300px;
+    overflow-y:auto;
+}
+
+.clear-recent-button {
+    display:block;
+    width:100%;
+    margin-top:12px;
+    background:rgba(255,80,80,.25);
+}
+
+.clear-recent-button:hover {
+    box-shadow:0 8px 25px rgba(255,80,80,.4);
+}
+
+#trackInfo {
+    color:#00eaff;
+    font-size:14px;
+}
+
+#sleepTimerSelect {
+    width:100%;
+}
+
+.section-header {
+    flex-wrap:wrap;
+    gap:10px;
+}
+
 
 .menu-button {
 
