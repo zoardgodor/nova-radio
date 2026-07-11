@@ -1,4 +1,4 @@
-const api = "https://de1.api.radio-browser.info/json";
+﻿const api = "https://de1.api.radio-browser.info/json";
 
 const audio = document.getElementById("audioPlayer");
 
@@ -16,9 +16,12 @@ const loading = document.getElementById("loading");
 const stationName = document.getElementById("stationName");
 const nowPlaying = document.getElementById("nowPlaying");
 const playerStatus = document.getElementById("playerStatus");
+const playerStatusSheet = document.getElementById("playerStatusSheet");
 
 const playButton = document.getElementById("playButton");
-const pauseButton = document.getElementById("pauseButton");
+const stopButton = document.getElementById("stopButton");
+const rewindButton = document.getElementById("rewindButton");
+const forwardButton = document.getElementById("forwardButton");
 
 const volumeSlider = document.getElementById("volumeSlider");
 
@@ -37,6 +40,19 @@ const englishButton = document.getElementById("englishButton");
 const hungarianButton = document.getElementById("hungarianButton");
 
 const trackInfo = document.getElementById("trackInfo");
+const playerBarStation = document.getElementById("playerBarStation");
+const playerBarMeta = document.getElementById("playerBarMeta");
+const playerBarIcon = document.getElementById("playerBarIcon");
+const stationIcon = document.getElementById("stationIcon");
+const playerSheetStation = document.getElementById("playerSheetStation");
+const playerSheetMeta = document.getElementById("playerSheetMeta");
+const playerSheetProtocol = document.getElementById("playerSheetProtocol");
+const playerSheetStream = document.getElementById("playerSheetStream");
+const playerSheetTrack = document.getElementById("playerSheetTrack");
+const playerSheetIcon = document.getElementById("playerSheetIcon");
+const playerBar = document.getElementById("playerBar");
+const playerSheet = document.getElementById("playerSheet");
+const closePlayerSheet = document.getElementById("closePlayerSheet");
 
 const recentList = document.getElementById("recentList");
 
@@ -47,8 +63,6 @@ const recentDropdown = document.getElementById("recentDropdown");
 const clearRecentButton = document.getElementById("clearRecentButton");
 
 const sleepTimerSelect = document.getElementById("sleepTimerSelect");
-
-const stopButton = document.getElementById("stopButton");
 
 
 let stations = [];
@@ -69,10 +83,6 @@ let nowPlayingTimer = null;
 
 let sleepTimer = null;
 
-let httpsTried = false;
-
-let httpsFallbackTimer = null;
-
 let retryTimes = [3000,5000,10000,15000,20000,30000];
 
 let retryIndex = 0;
@@ -89,21 +99,83 @@ audio.volume =
 Number(localStorage.getItem("volume")) || 0.7;
 
 
-function getSecureUrl(url){
-
+function getPlaybackUrl(url){
     if(!url){
         return null;
     }
 
+    return url;
+}
 
-    return url.replace(
-        /^http:\/\//i,
-        "https://"
-    );
+function getStationIcon(station){
+
+    if(
+        station.favicon &&
+        /^https?:\/\//i.test(station.favicon)
+    ){
+
+        return station.favicon;
+
+    }
+
+    return "";
 
 }
 
 
+function setTextWithTitle(element,text){
+    const value = text || "";
+    element.textContent = value;
+    element.title = value;
+}
+
+function updatePlayerUi(){
+    const label = currentStation ? currentStation.name : "No station selected";
+    const meta = currentStation ? (nowPlaying.textContent || translations[language].nothingPlaying) : translations[language].nothingPlaying;
+    const iconUrl = currentStation ? getStationIcon(currentStation) : "";
+    const activeUrl = currentStreamUrl || (currentStation && currentStation.url_resolved) || "";
+
+    stationName.textContent = label;
+    playerBarStation.textContent = label;
+    playerSheetStation.textContent = label;
+    playerBarMeta.textContent = meta;
+    playerSheetMeta.textContent = meta;
+    playerSheetProtocol.textContent = "";
+    playerSheetStream.textContent = activeUrl || "-";
+
+    [stationIcon, playerBarIcon, playerSheetIcon].forEach(element => {
+        element.innerHTML = "";
+        element.classList.remove("has-image");
+        if(iconUrl){
+            const img = document.createElement("img");
+            img.src = iconUrl;
+            img.alt = "";
+            img.loading = "lazy";
+            img.onerror = ()=>{
+                img.remove();
+                element.textContent = "♫";
+            };
+            element.appendChild(img);
+            element.classList.add("has-image");
+        } else {
+            element.textContent = "♫";
+        }
+    });
+}
+
+function updatePlaybackButtonState(){
+    if(!playButton){
+        return;
+    }
+
+    const shouldShowPause = !!currentStation && !audio.paused && !userPaused;
+    const icon = playButton.querySelector(".player-icon");
+    if(icon){
+        icon.textContent = shouldShowPause ? "❚❚" : "▶";
+    }
+
+    playButton.setAttribute("aria-label", shouldShowPause ? "Pause" : "Play");
+}
 
 function translatePage(){
 
@@ -199,7 +271,7 @@ function toggleFavorite(station){
         confirm(
             language === "hu"
             ?
-            "Biztosan törlöd a kedvencek közül?"
+            "Biztosan tĂ¶rlĂ¶d a kedvencek kĂ¶zĂĽl?"
             :
             "Are you sure you want to remove this station from favorites?"
         );
@@ -515,68 +587,73 @@ async function loadStations(reset=true){
 
 
 
-function createCard(station){
+function createCard(station,compact=false){
+    const row = document.createElement("div");
+    row.className = compact ? "radio-row compact" : "radio-row";
 
-    const card =
-    document.createElement("div");
+    const icon = document.createElement("div");
+    icon.className = "radio-row-icon";
 
-
-    card.className =
-    "radio-card";
-
-
-    card.innerHTML = `
-
-    <button class="favorite-button ${isFavorite(station.stationuuid) ? "active":""}">
-    ⭐
-    </button>
-
-    <h3>${station.name}</h3>
-
-    <p>${station.country || "Unknown country"}</p>
-
-    <p>${station.tags || "No genre"}</p>
-
-    ${
-    station.url_resolved &&
-    station.url_resolved.startsWith("http://")
-    ?
-    '<p class="http-warning">⚠️ HTTP stream</p>'
-    :
-    '<p class="https-warning">🔒 HTTPS stream</p>'
+    const iconUrl = getStationIcon(station);
+    if(iconUrl){
+        const image = document.createElement("img");
+        image.src = iconUrl;
+        image.alt = "";
+        image.loading = "lazy";
+        image.onerror = ()=>{
+            image.remove();
+            icon.textContent = "♫";
+        };
+        icon.appendChild(image);
+    } else {
+        icon.textContent = "♫";
     }
 
-    `;
+    const content = document.createElement("div");
+    content.className = "radio-row-content";
 
+    const title = document.createElement("div");
+    title.className = "radio-row-title";
+    setTextWithTitle(title, station.name || "Unknown station");
 
+    const sub = document.createElement("div");
+    sub.className = "radio-row-sub";
+    const genreText = station.tags || station.country || translations[language].noGenre;
+    setTextWithTitle(sub, genreText);
 
-    card.onclick =
-    event=>{
+    content.appendChild(title);
+    if(!compact){
+        content.appendChild(sub);
+    }
 
-        if(
-            event.target.classList.contains(
-                "favorite-button"
-            )
-        ){
+    const protocol = document.createElement("span");
+    protocol.className = "protocol-pill";
+    protocol.textContent = (station.url_resolved || station.url || "").startsWith("https://") ? "HTTPS" : "HTTP";
 
+    const favoriteButton = document.createElement("button");
+    favoriteButton.className = `favorite-button ${isFavorite(station.stationuuid) ? "active" : ""}`;
+    favoriteButton.type = "button";
+    favoriteButton.textContent = "★";
+    favoriteButton.title = isFavorite(station.stationuuid) ? "Remove from favorites" : "Add to favorites";
+
+    row.appendChild(icon);
+    row.appendChild(content);
+    if(!compact){
+        row.appendChild(protocol);
+    }
+    row.appendChild(favoriteButton);
+
+    row.onclick = event=>{
+        if(event.target.closest(".favorite-button")){
             toggleFavorite(station);
-
             return;
-
         }
-
-
         playStation(station);
-
         sidebar.classList.remove("open");
-
         overlay.classList.remove("show");
-
     };
 
-
-    return card;
-
+    return row;
 }
 
 function displayStations(){
@@ -598,35 +675,18 @@ function displayStations(){
 
 
 function displayFavorites(){
-
-    favoritesList.innerHTML="";
-
+    favoritesList.innerHTML = "";
     const favorites = getFavorites();
 
-
     if(favorites.length === 0){
-
-        favoritesList.innerHTML =
-        "<p>No favorites</p>";
-
+        favoritesList.innerHTML = `<p>${translations[language].noFavorites}</p>`;
         return;
-
     }
 
-
-    favorites.forEach(
-        station=>{
-
-            favoritesList.appendChild(
-                createCard(station)
-            );
-
-        }
-    );
-
+    favorites.forEach(station=>{
+        favoritesList.appendChild(createCard(station, true));
+    });
 }
-
-
 
 async function fetchNowPlayingMetadata(station){
 
@@ -747,31 +807,23 @@ function updateMediaSession(station,track){
 async function updateNowPlayingTrack(){
 
     if(!currentStation){
-
         return;
-
     }
-
 
     const track =
     await fetchNowPlayingMetadata(currentStation);
 
 
     if(track){
-
-        trackInfo.textContent =
-        translations[language].trackLabel + ": " + track;
-
+        trackInfo.textContent = translations[language].trackLabel + ": " + track;
+        playerSheetTrack.textContent = track;
         trackInfo.classList.remove("hidden");
-
     }
-
     else {
-
-        trackInfo.classList.add("hidden");
-
+        trackInfo.textContent = translations[language].noTrackInfo;
+        playerSheetTrack.textContent = translations[language].noTrackInfo;
+        trackInfo.classList.remove("hidden");
     }
-
 
     updateMediaSession(currentStation,track);
 
@@ -818,144 +870,64 @@ function stopNowPlayingPolling(){
 
 
 function setStatus(text,type){
-
     currentStatus = type;
-
-
-    let protocolText = "";
-
-    if(currentStreamUrl){
-
-        protocolText =
-        currentStreamUrl.startsWith("https://")
-        ?
-        " 🔒 HTTPS"
-        :
-        " ⚠️ HTTP";
-
-    }
-
-
-    playerStatus.textContent =
-    text + protocolText;
-
-
-    playerStatus.className =
-    "status " + type;
-
+    playerStatus.textContent = text;
+    playerStatusSheet.textContent = text;
+    playerStatus.className = "status " + type;
+    playerStatusSheet.className = "status " + type;
+    updatePlayerUi();
 }
 
 
 
-function playStation(station){
+function getRetryStreamUrl(){
 
-    manualStop = false;
-
-    if(httpsFallbackTimer){
-
-        clearTimeout(httpsFallbackTimer);
-        httpsFallbackTimer = null;
-
+    if(!currentStation){
+        return null;
     }
 
+    return getPlaybackUrl(currentStation.url_resolved || currentStation.url);
+
+}
+
+function playStation(station){
+    manualStop = false;
+    userPaused = false;
 
     if(retryTimer){
-
         clearTimeout(retryTimer);
         retryTimer = null;
-
     }
 
     currentStation = station;
-
-    localStorage.setItem(
-        "lastStation",
-        JSON.stringify(station)
-    );
-
+    localStorage.setItem("lastStation", JSON.stringify(station));
     retryIndex = 0;
 
+    let originalUrl = station.url_resolved || station.url;
 
-    let originalUrl = station.url_resolved;
-
-    httpsTried = false;
-
-    if(originalUrl.startsWith("http://")){
-
-        currentStreamUrl =
-        originalUrl.replace(
-            /^http:\/\//i,
-            "https://"
-        );
-
-        httpsFallbackTimer =
-        setTimeout(()=>{
-
-            if(audio.readyState < 3 && !httpsTried){
-
-                httpsTried = true;
-
-                currentStreamUrl = originalUrl;
-
-                audio.src = originalUrl;
-
-                setStatus(
-                    "⚠️ HTTP használva (HTTPS nem működött)",
-                    "playing"
-                );
-
-                audio.play();
-
-            }
-
-        },8000);
-
-    }
-    else {
-
-        currentStreamUrl = originalUrl;
-
+    if(!originalUrl){
+        setStatus(translations[language].connectionLost, "error");
+        return;
     }
 
+    currentStreamUrl = getPlaybackUrl(originalUrl);
 
     audio.src = currentStreamUrl;
 
-
-    audio.play()
-    .catch(()=>{
-
-        setStatus(
-            translations[language].paused,
-            "paused"
-        );
-
+    audio.play().catch(()=>{
+        setStatus(translations[language].paused, "paused");
     });
 
-
-    stationName.textContent =
-    station.name;
-
-
-    nowPlaying.textContent =
-    "Streaming";
-
-
-    setStatus(
-        translations[language].playing,
-        "playing"
-    );
-
+    stationName.textContent = station.name;
+    nowPlaying.textContent = translations[language].streaming;
+    updatePlayerUi();
+    setStatus(translations[language].playing, "playing");
 
     addRecent(station);
-
-
     startNowPlayingPolling();
-
-
-    updateMediaSession(station,null);
-
+    updateMediaSession(station, null);
+    updatePlaybackButtonState();
 }
-
 
 function retryConnection(){
 
@@ -971,8 +943,6 @@ function retryConnection(){
     if(!currentStation){
         return;
     }
-
-
 
     if(retryIndex >= retryTimes.length){
 
@@ -1005,9 +975,7 @@ function retryConnection(){
     setTimeout(()=>{
 
         currentStreamUrl =
-        getSecureUrl(
-            currentStation.url_resolved
-        );
+        getRetryStreamUrl();
 
         audio.src = currentStreamUrl;
 
@@ -1045,49 +1013,25 @@ audio.addEventListener(
 });
 
 
-audio.addEventListener(
-"playing",
-()=>{
-
-    if(httpsFallbackTimer){
-
-        clearTimeout(httpsFallbackTimer);
-        httpsFallbackTimer = null;
-
-    }
-
-
+audio.addEventListener("playing", ()=>{
     retryIndex = 0;
 
     if(retryTimer){
-
         clearTimeout(retryTimer);
         retryTimer = null;
-
     }
 
-
-    setStatus(
-        translations[language].playing,
-        "playing"
-    );
-
+    userPaused = false;
+    setStatus(translations[language].playing, "playing");
+    updatePlaybackButtonState();
 });
 
 
-audio.addEventListener(
-"pause",
-()=>{
-
+audio.addEventListener("pause", ()=>{
     if(userPaused){
-
-        setStatus(
-            translations[language].paused,
-            "paused"
-        );
-
+        setStatus(translations[language].paused, "paused");
     }
-
+    updatePlaybackButtonState();
 });
 
 
@@ -1146,80 +1090,43 @@ window.addEventListener(
 });
 
 
-
-    playButton.onclick =
-()=>{
+playButton.onclick = ()=>{
+    if(currentStation && !audio.paused && !userPaused){
+        userPaused = true;
+        audio.pause();
+        stopNowPlayingPolling();
+        updatePlaybackButtonState();
+        return;
+    }
 
     manualStop = false;
-
     userPaused = false;
     retryIndex = 0;
 
-
     if(!currentStation){
-
-        const saved =
-        localStorage.getItem("lastStation");
-
-
+        const saved = localStorage.getItem("lastStation");
         if(saved){
-
-            currentStation =
-            JSON.parse(saved);
-
-            stationName.textContent =
-            currentStation.name;
-
-        }
-        else{
-
+            currentStation = JSON.parse(saved);
+            stationName.textContent = currentStation.name;
+        } else {
             return;
-
         }
-
     }
-
 
     if(!currentStreamUrl){
-
-        currentStreamUrl =
-        getSecureUrl(
-            currentStation.url_resolved
-        );
-
-        audio.src =
-        currentStreamUrl;
-
+        currentStreamUrl = getRetryStreamUrl();
+        audio.src = currentStreamUrl;
     }
 
-
-    audio.play()
-    .catch(error=>{
-
+    audio.play().catch(error=>{
         console.log(error);
-
     });
 
-
     startNowPlayingPolling();
-
+    updatePlaybackButtonState();
 };
 
-
-
-pauseButton.onclick =
-()=>{
-
-    userPaused = true;
-    audio.pause();
-
-    stopNowPlayingPolling();
-
-};
-
-
-stopButton.onclick =
-()=>{
+stopButton.onclick = ()=>{
 
     manualStop = true;
 
@@ -1231,14 +1138,6 @@ stopButton.onclick =
         retryTimer = null;
 
     }
-
-    if(httpsFallbackTimer){
-
-        clearTimeout(httpsFallbackTimer);
-        httpsFallbackTimer = null;
-
-    }
-
 
     audio.pause();
 
@@ -1261,7 +1160,21 @@ stopButton.onclick =
 
     nowPlaying.textContent =
     translations[language].nothingPlaying || "Nothing playing";
+    updatePlayerUi();
+    updatePlaybackButtonState();
 
+};
+
+rewindButton.onclick = ()=>{
+    if(audio.currentTime > 10){
+        audio.currentTime -= 10;
+    } else {
+        audio.currentTime = 0;
+    }
+};
+
+forwardButton.onclick = ()=>{
+    audio.currentTime += 10;
 };
 
 
@@ -1390,35 +1303,13 @@ sleepTimerSelect.onchange =
 
 
 
-document.addEventListener(
-"keydown",
-event=>{
-
-    if(
-        event.code !== "Space" ||
-        event.target === searchInput
-    ){
-
+document.addEventListener("keydown", event=>{
+    if(event.code !== "Space" || event.target === searchInput){
         return;
-
     }
-
 
     event.preventDefault();
-
-
-    if(userPaused || audio.paused){
-
-        playButton.onclick();
-
-    }
-
-    else {
-
-        pauseButton.onclick();
-
-    }
-
+    playButton.onclick();
 });
 
 
@@ -1439,7 +1330,7 @@ if("mediaSession" in navigator){
         "pause",
         ()=>{
 
-            pauseButton.onclick();
+            playButton.onclick();
 
         }
     );
@@ -1505,14 +1396,26 @@ closeMenuButton.onclick =
 
 
 
-overlay.onclick =
-()=>{
-
+overlay.onclick = ()=>{
     sidebar.classList.remove("open");
-
     overlay.classList.remove("show");
-
+    playerSheet.classList.remove("open");
 };
+
+playerBar.onclick = ()=>{
+    playerSheet.classList.add("open");
+};
+
+closePlayerSheet.onclick = ()=>{
+    playerSheet.classList.remove("open");
+};
+
+playerBar.addEventListener("keydown", event=>{
+    if(event.key === "Enter" || event.key === " "){
+        event.preventDefault();
+        playerSheet.classList.add("open");
+    }
+});
 
 
 
@@ -1540,15 +1443,13 @@ audio.volume;
 
 
 translatePage();
+updatePlayerUi();
+updatePlaybackButtonState();
 
 loadCountries();
-
 loadGenres();
-
 loadStations();
-
 displayFavorites();
-
 displayRecent();
 
 const savedStation =
@@ -1583,3 +1484,9 @@ if("serviceWorker" in navigator){
     });
 
 }
+
+
+
+
+
+
