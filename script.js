@@ -483,11 +483,19 @@ async function loadGenres(){
 
 
     genres
+    .filter(
+
+        tag =>
+
+        tag.stationcount > 20
+        
+    )
+    
     .sort(
         (a,b)=>
         b.stationcount-a.stationcount
     )
-    .slice(0,150)
+    .slice(0,800)
     .forEach(
         tag=>{
 
