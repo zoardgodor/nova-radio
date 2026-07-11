@@ -1,4 +1,4 @@
-﻿const api = "https://de1.api.radio-browser.info/json";
+const api = "https://de1.api.radio-browser.info/json";
 
 const audio = document.getElementById("audioPlayer");
 
@@ -483,10 +483,6 @@ async function loadGenres(){
 
 
     genres
-    .filter(
-        tag =>
-        tag.stationcount > 100
-    )
     .sort(
         (a,b)=>
         b.stationcount-a.stationcount
