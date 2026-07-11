@@ -90,3 +90,13 @@ Radio data provided by:
 Radio Browser API
 
 https://api.radio-browser.info/
+
+## Disclaimer
+
+Nova Radio does not host, store, or control any radio streams or station content.
+
+Station information is provided by the Radio Browser project, and streams are provided by the respective radio stations.
+
+Nova Radio is only a client application that helps users discover and play publicly available internet radio stations.
+
+The availability, legality, and content of individual streams are the responsibility of the respective radio stations.
