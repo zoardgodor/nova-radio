@@ -1,4 +1,4 @@
-const CACHE_NAME = "nova-radio-v3";
+const CACHE_NAME = "nova-radio-v4";
 
 const FILES = [
     "./",
