@@ -212,6 +212,8 @@ select option:hover {
   font-size: 20px;
   flex-shrink: 0;
   overflow: hidden;
+  text-align: center;
+  line-height: 1;
 }
 
 .station-icon img,
@@ -447,19 +449,25 @@ select option:hover {
   position: fixed;
   left: 10px;
   right: 10px;
-  bottom: 10px;
-  max-height: calc(100vh - 70px);
+  bottom: 0;
+  max-height: calc(100vh - 24px);
   background: rgba(13, 16, 21, 0.98);
+  pointer-events: none;
   border: 1px solid var(--border);
-  border-radius: 18px 18px 12px 12px;
+  border-radius: 18px 18px 0 0;
   padding: 16px;
   z-index: 45;
-  transform: translateY(calc(100% + 16px));
+  transform: translateY(100%);
   transition: 0.28s ease;
+  visibility: hidden;
+  opacity: 0;
 }
 
 .player-sheet.open {
   transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+  opacity: 1;
 }
 
 .player-sheet-close {
@@ -504,6 +512,23 @@ select option:hover {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.player-sheet-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+}
+
+.player-sheet-controls .player-icon-button {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+.player-sheet-controls .player-icon-button.primary {
+  min-width: 54px;
+  min-height: 54px;
 }
 
 .player-sheet-row {

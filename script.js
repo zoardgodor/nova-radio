@@ -22,6 +22,10 @@ const playButton = document.getElementById("playButton");
 const stopButton = document.getElementById("stopButton");
 const rewindButton = document.getElementById("rewindButton");
 const forwardButton = document.getElementById("forwardButton");
+const sheetPlayButton = document.getElementById("sheetPlayButton");
+const sheetStopButton = document.getElementById("sheetStopButton");
+const sheetRewindButton = document.getElementById("sheetRewindButton");
+const sheetForwardButton = document.getElementById("sheetForwardButton");
 
 const volumeSlider = document.getElementById("volumeSlider");
 
@@ -63,6 +67,16 @@ const recentDropdown = document.getElementById("recentDropdown");
 const clearRecentButton = document.getElementById("clearRecentButton");
 
 const sleepTimerSelect = document.getElementById("sleepTimerSelect");
+
+function setPlayerSheetOpen(open){
+    if(open){
+        playerSheet.classList.add("open");
+        playerSheet.setAttribute("aria-hidden", "false");
+    } else {
+        playerSheet.classList.remove("open");
+        playerSheet.setAttribute("aria-hidden", "true");
+    }
+}
 
 
 let stations = [];
@@ -164,17 +178,19 @@ function updatePlayerUi(){
 }
 
 function updatePlaybackButtonState(){
-    if(!playButton){
+    const playButtons = [playButton, sheetPlayButton].filter(Boolean);
+    if(playButtons.length === 0){
         return;
     }
 
     const shouldShowPause = !!currentStation && !audio.paused && !userPaused;
-    const icon = playButton.querySelector(".player-icon");
-    if(icon){
-        icon.textContent = shouldShowPause ? "❚❚" : "▶";
-    }
-
-    playButton.setAttribute("aria-label", shouldShowPause ? "Pause" : "Play");
+    playButtons.forEach(button => {
+        const icon = button.querySelector(".player-icon");
+        if(icon){
+            icon.textContent = shouldShowPause ? "❚❚" : "▶";
+        }
+        button.setAttribute("aria-label", shouldShowPause ? "Pause" : "Play");
+    });
 }
 
 function translatePage(){
@@ -1090,7 +1106,9 @@ window.addEventListener(
 });
 
 
-playButton.onclick = ()=>{
+function handlePlayToggle(event){
+    event?.stopPropagation();
+
     if(currentStation && !audio.paused && !userPaused){
         userPaused = true;
         audio.pause();
@@ -1124,9 +1142,10 @@ playButton.onclick = ()=>{
 
     startNowPlayingPolling();
     updatePlaybackButtonState();
-};
+}
 
-stopButton.onclick = ()=>{
+function handleStop(event){
+    event?.stopPropagation();
 
     manualStop = true;
 
@@ -1162,20 +1181,32 @@ stopButton.onclick = ()=>{
     translations[language].nothingPlaying || "Nothing playing";
     updatePlayerUi();
     updatePlaybackButtonState();
+}
 
-};
+function handleRewind(event){
+    event?.stopPropagation();
 
-rewindButton.onclick = ()=>{
     if(audio.currentTime > 10){
         audio.currentTime -= 10;
     } else {
         audio.currentTime = 0;
     }
-};
+}
 
-forwardButton.onclick = ()=>{
+function handleForward(event){
+    event?.stopPropagation();
+
     audio.currentTime += 10;
-};
+}
+
+playButton.onclick = handlePlayToggle;
+sheetPlayButton.onclick = handlePlayToggle;
+stopButton.onclick = handleStop;
+sheetStopButton.onclick = handleStop;
+rewindButton.onclick = handleRewind;
+sheetRewindButton.onclick = handleRewind;
+forwardButton.onclick = handleForward;
+sheetForwardButton.onclick = handleForward;
 
 
 
@@ -1399,16 +1430,38 @@ closeMenuButton.onclick =
 overlay.onclick = ()=>{
     sidebar.classList.remove("open");
     overlay.classList.remove("show");
-    playerSheet.classList.remove("open");
+    setPlayerSheetOpen(false);
 };
 
-playerBar.onclick = ()=>{
-    playerSheet.classList.add("open");
-};
+playerBar.addEventListener("click", event=>{
+    if(event.target.closest(".player-icon-button")){
+        return;
+    }
+
+    setPlayerSheetOpen(!playerSheet.classList.contains("open"));
+});
 
 closePlayerSheet.onclick = ()=>{
-    playerSheet.classList.remove("open");
+    setPlayerSheetOpen(false);
 };
+
+document.addEventListener("click", event=>{
+    if(!playerSheet.classList.contains("open")){
+        return;
+    }
+
+    if(event.target.closest(".player-sheet") || event.target.closest(".player-bar")){
+        return;
+    }
+
+    setPlayerSheetOpen(false);
+});
+
+document.addEventListener("keydown", event=>{
+    if(event.key === "Escape"){
+        setPlayerSheetOpen(false);
+    }
+});
 
 playerBar.addEventListener("keydown", event=>{
     if(event.key === "Enter" || event.key === " "){
