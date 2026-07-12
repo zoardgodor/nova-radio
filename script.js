@@ -1300,21 +1300,20 @@ sleepTimerSelect.onchange =
 
     sleepTimer =
     setTimeout(()=>{
-
-        userPaused = true;
-        audio.pause();
-        stopNowPlayingPolling();
-
-        setStatus(
-            translations[language].sleepTimerFinished,
-            "paused"
-        );
-
+    
+        handleStop();
+    
+        playerStatus.textContent =
+            translations[language].sleepTimerFinished;
+    
+        playerStatusSheet.textContent =
+            translations[language].sleepTimerFinished;
+    
         sleepTimer = null;
-
+    
         sleepTimerSelect.value = "0";
-
-    },minutes * 60 * 1000);
+    
+    }, minutes * 60 * 1000);
 
 
     setStatus(
