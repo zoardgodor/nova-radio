@@ -109,8 +109,11 @@ let language =
 localStorage.getItem("language") || "en";
 
 
-audio.volume =
-Number(localStorage.getItem("volume")) || 0.7;
+const savedVolume = localStorage.getItem("volume");
+
+audio.volume = savedVolume !== null
+    ? Number(savedVolume)
+    : 0.7;
 
 
 function getPlaybackUrl(url){
@@ -287,7 +290,7 @@ function toggleFavorite(station){
         confirm(
             language === "hu"
             ?
-            "Biztosan tĂ¶rlĂ¶d a kedvencek kĂ¶zĂĽl?"
+            "Biztosan törlöd a kedvencek közül?"
             :
             "Are you sure you want to remove this station from favorites?"
         );
@@ -656,7 +659,10 @@ function createCard(station,compact=false){
     row.appendChild(favoriteButton);
 
     row.onclick = event=>{
-        if(event.target.closest(".favorite-button")){
+        if(
+            event.target.closest &&
+            event.target.closest(".favorite-button")
+        ){
             toggleFavorite(station);
             return;
         }
@@ -793,25 +799,29 @@ async function fetchNowPlayingMetadata(station){
 
 
 
-function updateMediaSession(station,track){
+function updateMediaSession(station, track){
 
-    if(!("mediaSession" in navigator)){
-
+    if(
+        !("mediaSession" in navigator) ||
+        typeof MediaMetadata === "undefined"
+    ){
         return;
-
     }
 
-
-    navigator.mediaSession.metadata =
-    new MediaMetadata({
-        title: track || station.name,
-        artist: station.name,
-        album: station.country || "",
-        artwork: station.favicon ?
-        [{src:station.favicon,sizes:"512x512",type:"image/png"}] :
-        []
-    });
-
+    try {
+        navigator.mediaSession.metadata =
+        new MediaMetadata({
+            title: track || station.name,
+            artist: station.name,
+            album: station.country || "",
+            artwork: station.favicon ?
+            [{src:station.favicon,sizes:"512x512",type:"image/png"}] :
+            []
+        });
+    }
+    catch(e){
+        console.log("MediaSession error:", e);
+    }
 }
 
 
@@ -1342,24 +1352,26 @@ document.addEventListener("keydown", event=>{
 
 if("mediaSession" in navigator){
 
-    navigator.mediaSession.setActionHandler(
-        "play",
-        ()=>{
+    try {
 
-            playButton.onclick();
+        navigator.mediaSession.setActionHandler(
+            "play",
+            ()=>{
+                handlePlayToggle();
+            }
+        );
 
-        }
-    );
+        navigator.mediaSession.setActionHandler(
+            "pause",
+            ()=>{
+                handlePlayToggle();
+            }
+        );
 
-
-    navigator.mediaSession.setActionHandler(
-        "pause",
-        ()=>{
-
-            playButton.onclick();
-
-        }
-    );
+    }
+    catch(e){
+        console.log("MediaSession actions not supported:", e);
+    }
 
 }
 
@@ -1429,7 +1441,7 @@ overlay.onclick = ()=>{
 };
 
 playerBar.addEventListener("click", event=>{
-    if(event.target.closest(".player-icon-button")){
+    if(event.target.matches(".player-icon-button") || event.target.closest && event.target.closest(".player-icon-button")){
         return;
     }
 
@@ -1445,7 +1457,10 @@ document.addEventListener("click", event=>{
         return;
     }
 
-    if(event.target.closest(".player-sheet") || event.target.closest(".player-bar")){
+    if(
+        (event.target.closest && event.target.closest(".player-sheet")) ||
+        (event.target.closest && event.target.closest(".player-bar"))
+    ){
         return;
     }
 
@@ -1516,7 +1531,7 @@ if(savedStation){
 
 if("serviceWorker" in navigator){
 
-    navigator.serviceWorker.register("sw.js")
+    navigator.serviceWorker.register("./sw.js")
     .then(()=>{
 
         console.log("Service Worker registered");
