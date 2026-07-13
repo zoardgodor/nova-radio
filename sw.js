@@ -1,4 +1,4 @@
-const CACHE_NAME = "nova-radio-v5";
+const CACHE_NAME = "nova-radio-v6";
 
 const FILES = [
     "./",
@@ -6,7 +6,9 @@ const FILES = [
     "./styles.css",
     "./script.js",
     "./translations.js",
-    "./manifest.json"
+    "./manifest.json",
+    "./icon-192.png",
+    "./icon-512.png"
 ];
 
 
