@@ -14,6 +14,9 @@ Nova Radio uses the Radio Browser API to search and play thousands of online rad
 - ⭐ Save favorite stations locally
 - 📥 Load more stations dynamically
 - 📱 Responsive mobile-friendly design
+- 🔗 Share the app or a station with the Web Share API or clipboard fallback
+- 🪲 Report bugs by copying the support email address from the menu
+- 🌐 English and Hungarian interface translations
 
 ## Technologies
 
@@ -31,6 +34,9 @@ radio-player/
 ├── index.html
 ├── styles.css
 ├── script.js
+├── translations.js
+├── manifest.json
+├── sw.js
 └── README.md
 ```
 

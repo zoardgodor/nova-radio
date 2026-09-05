@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="manifest.json?v=7">
   <meta name="theme-color" content="#00c6ff">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Nova Radio</title>
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
   <link rel="preconnect" href="https://de1.api.radio-browser.info">
 </head>
 <body>
@@ -15,10 +15,15 @@
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
       <h2>Nova Radio</h2>
-      <button id="closeMenuButton" class="sidebar-close" type="button">✕</button>
+      <button id="closeMenuButton" class="sidebar-close" type="button" data-i18n-aria-label="close" aria-label="Close">✕</button>
     </div>
 
     <div class="sidebar-content">
+      <div class="menu-group sidebar-actions">
+        <button id="sharePageButton" class="menu-button share-button" type="button" data-i18n-aria-label="share" data-i18n-title="share" aria-label="Share" title="Share">⤴</button>
+        <button id="recordButton" class="menu-button record-button" type="button" data-i18n-aria-label="startRecording" data-i18n-title="startRecording" aria-label="Start recording" title="Start recording"><span class="record-indicator"></span></button>
+      </div>
+
       <div class="menu-group">
         <button id="favoritesToggle" class="menu-button" type="button">
           <span data-i18n="favorites">Favorites</span>
@@ -59,8 +64,10 @@
 
       <div class="menu-group">
         <h3>Nova Radio</h3>
-        <p>Version 5.0</p>
+        <p data-i18n="version">Version v6</p>
       </div>
+
+      <button id="bugReportButton" class="bug-report-button" type="button" data-i18n-aria-label="reportBug" data-i18n-title="reportBug" aria-label="Report a bug" title="Report a bug">🪲</button>
     </div>
   </aside>
 
@@ -75,7 +82,7 @@
 
     <section class="search-panel">
       <div class="search-row">
-        <input id="searchInput" type="text" placeholder="Search radio stations...">
+        <input id="searchInput" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="Search radio stations...">
         <button id="searchButton" type="button" data-i18n="search">Search</button>
       </div>
       <div class="filter-row">
@@ -93,7 +100,6 @@
       <div class="station-info">
         <h2 id="stationName">No station selected</h2>
         <p id="nowPlaying">Nothing playing</p>
-        <p id="trackInfo" class="hidden"></p>
         <div class="status-box">
           <span class="status-label" data-i18n="status">Status</span>
           <span id="playerStatus" class="status ready">Ready</span>
@@ -104,32 +110,33 @@
     <section class="stations">
       <div class="section-header">
         <h2 data-i18n="stations">Stations</h2>
-        <div id="loading" class="hidden">Loading...</div>
+        <div id="loading" class="hidden" data-i18n="loading">Loading...</div>
       </div>
       <div id="radioList" class="radio-list"></div>
       <button id="loadMoreButton" class="load-more-button" type="button" data-i18n="loadMore">Load More Stations</button>
     </section>
   </div>
 
-  <div id="playerBar" class="player-bar" role="button" tabindex="0" aria-label="Open player details">
+  <div id="playerBar" class="player-bar" role="button" tabindex="0" data-i18n-aria-label="openPlayer" aria-label="Open player details">
     <div class="player-bar-main">
       <div id="playerBarIcon" class="player-bar-icon">♫</div>
       <div class="player-bar-text">
         <div id="playerBarStation" class="player-bar-station">No station selected</div>
         <div id="playerBarMeta" class="player-bar-meta">Nothing playing</div>
+        <div id="playerBarQuality" class="player-bar-quality" data-i18n="qualityUnavailable">Quality unavailable</div>
       </div>
       <div class="player-bar-actions">
-        <button id="rewindButton" class="player-icon-button" type="button" aria-label="Rewind 10 seconds">
+        <button id="rewindButton" class="player-icon-button" type="button" data-i18n-aria-label="rewind" aria-label="Rewind 10 seconds">
           <span class="player-icon">⏪</span>
           <span class="player-icon-label">10</span>
         </button>
-        <button id="playButton" class="player-icon-button primary" type="button" aria-label="Play">
+        <button id="playButton" class="player-icon-button primary" type="button" data-i18n-aria-label="play" aria-label="Play">
           <span class="player-icon">▶</span>
         </button>
-        <button id="stopButton" class="player-icon-button" type="button" aria-label="Stop">
+        <button id="stopButton" class="player-icon-button" type="button" data-i18n-aria-label="stop" aria-label="Stop">
           <span class="player-icon">■</span>
         </button>
-        <button id="forwardButton" class="player-icon-button" type="button" aria-label="Forward 10 seconds">
+        <button id="forwardButton" class="player-icon-button" type="button" data-i18n-aria-label="forward" aria-label="Forward 10 seconds">
           <span class="player-icon">⏩</span>
           <span class="player-icon-label">10</span>
         </button>
@@ -138,7 +145,7 @@
   </div>
 
   <div id="playerSheet" class="player-sheet" aria-hidden="true">
-    <button id="closePlayerSheet" class="player-sheet-close" type="button" aria-label="Close">V</button>
+    <button id="closePlayerSheet" class="player-sheet-close" type="button" data-i18n-aria-label="close" aria-label="Close">V</button>
     <div class="player-sheet-header">
       <div id="playerSheetIcon" class="player-sheet-icon">♫</div>
       <div class="player-sheet-info">
@@ -149,17 +156,20 @@
     </div>
     <div class="player-sheet-body">
       <div class="player-sheet-controls">
-        <button id="sheetRewindButton" class="player-icon-button" type="button" aria-label="Rewind 10 seconds">
+        <button id="sheetRewindButton" class="player-icon-button" type="button" data-i18n-aria-label="rewind" aria-label="Rewind 10 seconds">
           <span class="player-icon">⏪</span>
         </button>
-        <button id="sheetPlayButton" class="player-icon-button primary" type="button" aria-label="Play">
+        <button id="sheetPlayButton" class="player-icon-button primary" type="button" data-i18n-aria-label="play" aria-label="Play">
           <span class="player-icon">▶</span>
         </button>
-        <button id="sheetStopButton" class="player-icon-button" type="button" aria-label="Stop">
+        <button id="sheetStopButton" class="player-icon-button" type="button" data-i18n-aria-label="stop" aria-label="Stop">
           <span class="player-icon">■</span>
         </button>
-        <button id="sheetForwardButton" class="player-icon-button" type="button" aria-label="Forward 10 seconds">
+        <button id="sheetForwardButton" class="player-icon-button" type="button" data-i18n-aria-label="forward" aria-label="Forward 10 seconds">
           <span class="player-icon">⏩</span>
+        </button>
+        <button id="shareStationButton" class="player-icon-button" type="button" data-i18n-aria-label="shareStation" data-i18n-title="shareStation" aria-label="Share station" title="Share station">
+          <span class="player-icon">⤴</span>
         </button>
       </div>
       <div class="player-sheet-row">
@@ -167,8 +177,8 @@
         <span id="playerSheetStream">-</span>
       </div>
       <div class="player-sheet-row">
-        <span data-i18n="currentTrack">Current track</span>
-        <span id="playerSheetTrack">-</span>
+        <span data-i18n="audioQuality">Audio quality</span>
+        <span id="playerSheetQuality" data-i18n="qualityUnavailable">Quality unavailable</span>
       </div>
       <div class="player-sheet-row">
         <span data-i18n="status">Status</span>
@@ -181,9 +191,29 @@
     </div>
   </div>
 
+  <div id="bugReportModal" class="dialog-backdrop hidden" role="presentation">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="bugReportTitle">
+      <h2 id="bugReportTitle" data-i18n="bugReportTitle">Do you see a bug?</h2>
+      <p data-i18n="bugReportMessage">Report on this email address: zoardgodor@duck.com</p>
+      <div class="dialog-actions">
+        <button id="cancelBugReportButton" class="dialog-button secondary" type="button" data-i18n="cancel">Cancel</button>
+        <button id="copyBugEmailButton" class="dialog-button primary" type="button" data-i18n="copyAddress">Copy address</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shareNoticeModal" class="dialog-backdrop hidden" role="presentation">
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="shareNoticeTitle">
+      <h2 id="shareNoticeTitle" data-i18n="linkCopied">Link copied</h2>
+      <div class="dialog-actions">
+        <button id="closeShareNoticeButton" class="dialog-button primary" type="button" data-i18n="close">Close</button>
+      </div>
+    </div>
+  </div>
+
   <audio id="audioPlayer" preload="none"></audio>
 
-  <script src="translations.js"></script>
-  <script src="script.js?v=6"></script>
+  <script src="translations.js?v=7"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>

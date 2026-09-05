@@ -43,16 +43,16 @@ const overlay = document.getElementById("overlay");
 const englishButton = document.getElementById("englishButton");
 const hungarianButton = document.getElementById("hungarianButton");
 
-const trackInfo = document.getElementById("trackInfo");
 const playerBarStation = document.getElementById("playerBarStation");
 const playerBarMeta = document.getElementById("playerBarMeta");
+const playerBarQuality = document.getElementById("playerBarQuality");
 const playerBarIcon = document.getElementById("playerBarIcon");
 const stationIcon = document.getElementById("stationIcon");
 const playerSheetStation = document.getElementById("playerSheetStation");
 const playerSheetMeta = document.getElementById("playerSheetMeta");
 const playerSheetProtocol = document.getElementById("playerSheetProtocol");
 const playerSheetStream = document.getElementById("playerSheetStream");
-const playerSheetTrack = document.getElementById("playerSheetTrack");
+const playerSheetQuality = document.getElementById("playerSheetQuality");
 const playerSheetIcon = document.getElementById("playerSheetIcon");
 const playerBar = document.getElementById("playerBar");
 const playerSheet = document.getElementById("playerSheet");
@@ -67,6 +67,17 @@ const recentDropdown = document.getElementById("recentDropdown");
 const clearRecentButton = document.getElementById("clearRecentButton");
 
 const sleepTimerSelect = document.getElementById("sleepTimerSelect");
+const sharePageButton = document.getElementById("sharePageButton");
+const shareStationButton = document.getElementById("shareStationButton");
+const recordButton = document.getElementById("recordButton");
+const bugReportButton = document.getElementById("bugReportButton");
+const bugReportModal = document.getElementById("bugReportModal");
+const cancelBugReportButton = document.getElementById("cancelBugReportButton");
+const copyBugEmailButton = document.getElementById("copyBugEmailButton");
+const shareNoticeModal = document.getElementById("shareNoticeModal");
+const closeShareNoticeButton = document.getElementById("closeShareNoticeButton");
+
+const bugReportEmail = "zoardgodor@duck.com";
 
 function setPlayerSheetOpen(open){
     if(open){
@@ -93,8 +104,6 @@ let page = 0;
 
 const pageSize = 100;
 
-let nowPlayingTimer = null;
-
 let sleepTimer = null;
 
 let retryTimes = [3000,5000,10000,15000,20000,30000];
@@ -104,6 +113,12 @@ let retryIndex = 0;
 let retryTimer = null;
 
 let manualStop = false;
+
+let mediaRecorder = null;
+
+let recordingChunks = [];
+
+let isRecording = false;
 
 let language =
 localStorage.getItem("language") || "en";
@@ -146,8 +161,23 @@ function setTextWithTitle(element,text){
     element.title = value;
 }
 
+function getStationQuality(station){
+    if(!station){
+        return translations[language].qualityUnavailable;
+    }
+
+    const parts = [];
+    if(station.codec){
+        parts.push(station.codec.toUpperCase());
+    }
+    if(Number(station.bitrate) > 0){
+        parts.push(`${station.bitrate} kbps`);
+    }
+    return parts.length ? parts.join(" · ") : translations[language].qualityUnavailable;
+}
+
 function updatePlayerUi(){
-    const label = currentStation ? currentStation.name : "No station selected";
+    const label = currentStation ? currentStation.name : translations[language].noStationSelected;
     const meta = currentStation ? (nowPlaying.textContent || translations[language].nothingPlaying) : translations[language].nothingPlaying;
     const iconUrl = currentStation ? getStationIcon(currentStation) : "";
     const activeUrl = currentStreamUrl || (currentStation && currentStation.url_resolved) || "";
@@ -159,6 +189,8 @@ function updatePlayerUi(){
     playerSheetMeta.textContent = meta;
     playerSheetProtocol.textContent = "";
     playerSheetStream.textContent = activeUrl || "-";
+    playerBarQuality.textContent = getStationQuality(currentStation);
+    playerSheetQuality.textContent = getStationQuality(currentStation);
 
     [stationIcon, playerBarIcon, playerSheetIcon].forEach(element => {
         element.innerHTML = "";
@@ -192,8 +224,108 @@ function updatePlaybackButtonState(){
         if(icon){
             icon.textContent = shouldShowPause ? "❚❚" : "▶";
         }
-        button.setAttribute("aria-label", shouldShowPause ? "Pause" : "Play");
+        button.setAttribute("aria-label", translations[language][shouldShowPause ? "pause" : "play"]);
     });
+}
+
+function showRecordingLockMessage(){
+    window.alert(translations[language].stopRecordingFirst);
+}
+
+function updateRecordingUi(){
+    const lockedButtons = [
+        playButton,
+        stopButton,
+        rewindButton,
+        forwardButton,
+        sheetPlayButton,
+        sheetStopButton,
+        sheetRewindButton,
+        sheetForwardButton
+    ];
+
+    lockedButtons.forEach(button=>{
+        button.classList.toggle("recording-locked", isRecording);
+    });
+
+    recordButton.classList.toggle("recording", isRecording);
+    const label = translations[language][isRecording ? "stopRecording" : "startRecording"];
+    recordButton.setAttribute("aria-label", label);
+    recordButton.title = label;
+}
+
+function downloadRecording(){
+    if(recordingChunks.length === 0){
+        return;
+    }
+
+    const type = mediaRecorder && mediaRecorder.mimeType ? mediaRecorder.mimeType : "audio/webm";
+    const recording = new Blob(recordingChunks, { type });
+    const downloadUrl = URL.createObjectURL(recording);
+    const link = document.createElement("a");
+    const stationName = (currentStation && currentStation.name) || "nova-radio";
+    const filename = stationName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "nova-radio";
+
+    link.href = downloadUrl;
+    link.download = `${filename}-${Date.now()}.webm`;
+    link.click();
+    URL.revokeObjectURL(downloadUrl);
+    recordingChunks = [];
+    setStatus(translations[language].recordingSaved, "ready");
+}
+
+function startRecording(){
+    if(!currentStation || audio.paused){
+        window.alert(translations[language].startRadioFirst);
+        return;
+    }
+
+    const captureStream = audio.captureStream || audio.mozCaptureStream;
+    if(!captureStream || !window.MediaRecorder){
+        window.alert(translations[language].recordingUnavailable);
+        return;
+    }
+
+    try {
+        const stream = captureStream.call(audio);
+        if(stream.getAudioTracks().length === 0){
+            throw new Error("No audio track");
+        }
+
+        const mimeType = ["audio/webm;codecs=opus", "audio/webm"]
+        .find(type=>MediaRecorder.isTypeSupported(type));
+        mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+        recordingChunks = [];
+        mediaRecorder.ondataavailable = event=>{
+            if(event.data.size > 0){
+                recordingChunks.push(event.data);
+            }
+        };
+        mediaRecorder.onstop = downloadRecording;
+        mediaRecorder.start();
+        isRecording = true;
+        updateRecordingUi();
+        setStatus(translations[language].recordingStarted, "playing");
+    } catch(error) {
+        mediaRecorder = null;
+        window.alert(translations[language].recordingUnavailable);
+    }
+}
+
+function stopRecording(){
+    if(mediaRecorder && mediaRecorder.state !== "inactive"){
+        mediaRecorder.stop();
+    }
+    isRecording = false;
+    updateRecordingUi();
+}
+
+function toggleRecording(){
+    if(isRecording){
+        stopRecording();
+        return;
+    }
+    startRecording();
 }
 
 function translatePage(){
@@ -216,6 +348,117 @@ function translatePage(){
 
     });
 
+    document.querySelectorAll("[data-i18n-aria-label]")
+    .forEach(element=>{
+        const key = element.dataset.i18nAriaLabel;
+        element.setAttribute("aria-label", translations[language][key]);
+    });
+
+    document.querySelectorAll("[data-i18n-title]")
+    .forEach(element=>{
+        const key = element.dataset.i18nTitle;
+        element.title = translations[language][key];
+    });
+
+    document.querySelectorAll("[data-i18n-placeholder]")
+    .forEach(element=>{
+        const key = element.dataset.i18nPlaceholder;
+        element.placeholder = translations[language][key];
+    });
+
+    updateRecordingUi();
+
+}
+
+function getAppUrl(){
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    return url;
+}
+
+function getStationUrl(station){
+    const url = getAppUrl();
+    if(station && station.stationuuid){
+        url.searchParams.set("station", station.stationuuid);
+    }
+    return url.toString();
+}
+
+function updateStationUrl(station){
+    history.replaceState({}, "", getStationUrl(station));
+}
+
+async function shareUrl(url, title, text){
+    const shareData = { title, text, url };
+
+    if(navigator.share){
+        try {
+            await navigator.share(shareData);
+            return;
+        } catch(error) {
+            if(error.name === "AbortError"){
+                return;
+            }
+        }
+    }
+
+    try {
+        await navigator.clipboard.writeText(url);
+        shareNoticeModal.classList.remove("hidden");
+    } catch(error) {
+        window.prompt(translations[language].copyLink, url);
+    }
+}
+
+function closeDialog(dialog){
+    dialog.classList.add("hidden");
+}
+
+function openBugReport(){
+    bugReportModal.classList.remove("hidden");
+}
+
+async function copyBugEmail(){
+    try {
+        await navigator.clipboard.writeText(bugReportEmail);
+    } catch(error) {
+        window.prompt(translations[language].copyAddress, bugReportEmail);
+    }
+    closeDialog(bugReportModal);
+}
+
+function sharePage(){
+    shareUrl(getAppUrl().toString(), "Nova Radio", "Nova Radio");
+}
+
+function shareStation(event){
+    event?.stopPropagation();
+    if(!currentStation){
+        return;
+    }
+    shareUrl(
+        getStationUrl(currentStation),
+        currentStation.name || "Nova Radio",
+        currentStation.name || "Nova Radio"
+    );
+}
+
+async function loadStationFromUrl(){
+    const stationId = new URLSearchParams(window.location.search).get("station");
+    if(!stationId){
+        return;
+    }
+
+    try {
+        const response = await fetch(`${api}/stations/byuuid/${encodeURIComponent(stationId)}`);
+        const result = await response.json();
+        if(result[0]){
+            playStation(result[0]);
+        }
+    } catch(error) {
+        console.log(error);
+    }
 }
 
 
@@ -231,15 +474,24 @@ function setLanguage(lang){
 
     translatePage();
 
+    displayStations();
     displayRecent();
 
     displayFavorites();
 
-    if(currentStation){
-
-        updateNowPlayingTrack();
-
-    }
+    nowPlaying.textContent = currentStation && currentStreamUrl
+        ? translations[language].streaming
+        : translations[language].nothingPlaying;
+    updatePlayerUi();
+    updatePlaybackButtonState();
+    const statusKey = {
+        ready: "ready",
+        playing: "playing",
+        buffering: "buffering",
+        paused: "paused",
+        error: "connectionLost"
+    }[currentStatus] || "ready";
+    setStatus(translations[language][statusKey], currentStatus);
 
 }
 
@@ -288,11 +540,7 @@ function toggleFavorite(station){
 
         const confirmed =
         confirm(
-            language === "hu"
-            ?
-            "Biztosan törlöd a kedvencek közül?"
-            :
-            "Are you sure you want to remove this station from favorites?"
+            translations[language].confirmRemoveFavorite
         );
 
 
@@ -629,7 +877,7 @@ function createCard(station,compact=false){
 
     const title = document.createElement("div");
     title.className = "radio-row-title";
-    setTextWithTitle(title, station.name || "Unknown station");
+    setTextWithTitle(title, station.name || translations[language].unknownStation);
 
     const sub = document.createElement("div");
     sub.className = "radio-row-sub";
@@ -649,7 +897,7 @@ function createCard(station,compact=false){
     favoriteButton.className = `favorite-button ${isFavorite(station.stationuuid) ? "active" : ""}`;
     favoriteButton.type = "button";
     favoriteButton.textContent = "★";
-    favoriteButton.title = isFavorite(station.stationuuid) ? "Remove from favorites" : "Add to favorites";
+    favoriteButton.title = translations[language][isFavorite(station.stationuuid) ? "removeFromFavorites" : "addToFavorites"];
 
     row.appendChild(icon);
     row.appendChild(content);
@@ -664,6 +912,10 @@ function createCard(station,compact=false){
             event.target.closest(".favorite-button")
         ){
             toggleFavorite(station);
+            return;
+        }
+        if(isRecording){
+            showRecordingLockMessage();
             return;
         }
         playStation(station);
@@ -706,191 +958,6 @@ function displayFavorites(){
     });
 }
 
-async function fetchNowPlayingMetadata(station){
-
-    try{
-
-        const streamUrl =
-        new URL(
-            currentStreamUrl || station.url_resolved
-        );
-
-
-        const statusUrl =
-        streamUrl.origin + "/status-json.xsl";
-
-
-        const response =
-        await fetch(statusUrl,{cache:"no-store"});
-
-
-        if(!response.ok){
-
-            throw new Error("no metadata");
-
-        }
-
-
-        const data =
-        await response.json();
-
-
-        let sources =
-        data.icestats &&
-        data.icestats.source;
-
-
-        if(!sources){
-
-            throw new Error("no metadata");
-
-        }
-
-
-        if(!Array.isArray(sources)){
-
-            sources = [sources];
-
-        }
-
-
-        const mountPath =
-        streamUrl.pathname;
-
-
-        let match =
-        sources.find(
-            source =>
-            source.listenurl &&
-            source.listenurl.indexOf(mountPath) !== -1
-        );
-
-
-        if(!match){
-
-            match = sources[0];
-
-        }
-
-
-        const title =
-        match &&
-        (match.title || match.yp_currently_playing);
-
-
-        if(!title){
-
-            throw new Error("no metadata");
-
-        }
-
-
-        return title;
-
-    }
-
-    catch(error){
-
-        return null;
-
-    }
-
-}
-
-
-
-function updateMediaSession(station, track){
-
-    if(
-        !("mediaSession" in navigator) ||
-        typeof MediaMetadata === "undefined"
-    ){
-        return;
-    }
-
-    try {
-        navigator.mediaSession.metadata =
-        new MediaMetadata({
-            title: track || station.name,
-            artist: station.name,
-            album: station.country || "",
-            artwork: station.favicon ?
-            [{src:station.favicon,sizes:"512x512",type:"image/png"}] :
-            []
-        });
-    }
-    catch(e){
-        console.log("MediaSession error:", e);
-    }
-}
-
-
-
-async function updateNowPlayingTrack(){
-
-    if(!currentStation){
-        return;
-    }
-
-    const track =
-    await fetchNowPlayingMetadata(currentStation);
-
-
-    if(track){
-        trackInfo.textContent = translations[language].trackLabel + ": " + track;
-        playerSheetTrack.textContent = track;
-        trackInfo.classList.remove("hidden");
-    }
-    else {
-        trackInfo.textContent = translations[language].noTrackInfo;
-        playerSheetTrack.textContent = translations[language].noTrackInfo;
-        trackInfo.classList.remove("hidden");
-    }
-
-    updateMediaSession(currentStation,track);
-
-}
-
-
-
-function startNowPlayingPolling(){
-
-    if(nowPlayingTimer){
-
-        clearInterval(nowPlayingTimer);
-
-    }
-
-
-    updateNowPlayingTrack();
-
-
-    nowPlayingTimer =
-    setInterval(
-        updateNowPlayingTrack,
-        20000
-    );
-
-}
-
-
-
-function stopNowPlayingPolling(){
-
-    if(nowPlayingTimer){
-
-        clearInterval(nowPlayingTimer);
-        nowPlayingTimer = null;
-
-    }
-
-
-    trackInfo.classList.add("hidden");
-
-}
-
-
-
 function setStatus(text,type){
     currentStatus = type;
     playerStatus.textContent = text;
@@ -913,6 +980,11 @@ function getRetryStreamUrl(){
 }
 
 function playStation(station){
+    if(isRecording){
+        showRecordingLockMessage();
+        return;
+    }
+
     manualStop = false;
     userPaused = false;
 
@@ -934,6 +1006,8 @@ function playStation(station){
 
     currentStreamUrl = getPlaybackUrl(originalUrl);
 
+    updateStationUrl(station);
+
     audio.src = currentStreamUrl;
 
     audio.play().catch(()=>{
@@ -946,8 +1020,6 @@ function playStation(station){
     setStatus(translations[language].playing, "playing");
 
     addRecent(station);
-    startNowPlayingPolling();
-    updateMediaSession(station, null);
     updatePlaybackButtonState();
 }
 
@@ -988,7 +1060,8 @@ function retryConnection(){
         translations[language].retrying +
         " " +
         (time/1000) +
-        "s",
+        " " +
+        translations[language].secondsSuffix,
         "buffering"
     );
 
@@ -1115,10 +1188,14 @@ window.addEventListener(
 function handlePlayToggle(event){
     event?.stopPropagation();
 
+    if(isRecording){
+        showRecordingLockMessage();
+        return;
+    }
+
     if(currentStation && !audio.paused && !userPaused){
         userPaused = true;
         audio.pause();
-        stopNowPlayingPolling();
         updatePlaybackButtonState();
         return;
     }
@@ -1146,12 +1223,16 @@ function handlePlayToggle(event){
         console.log(error);
     });
 
-    startNowPlayingPolling();
     updatePlaybackButtonState();
 }
 
 function handleStop(event){
     event?.stopPropagation();
+
+    if(isRecording){
+        showRecordingLockMessage();
+        return;
+    }
 
     manualStop = true;
 
@@ -1173,12 +1254,11 @@ function handleStop(event){
 
     currentStreamUrl = null;
 
-
-    stopNowPlayingPolling();
+    updateStationUrl(null);
 
 
     setStatus(
-        translations[language].stopped || "Stopped",
+        translations[language].stopped,
         "ready"
     );
 
@@ -1192,6 +1272,11 @@ function handleStop(event){
 function handleRewind(event){
     event?.stopPropagation();
 
+    if(isRecording){
+        showRecordingLockMessage();
+        return;
+    }
+
     if(audio.currentTime > 10){
         audio.currentTime -= 10;
     } else {
@@ -1201,6 +1286,11 @@ function handleRewind(event){
 
 function handleForward(event){
     event?.stopPropagation();
+
+    if(isRecording){
+        showRecordingLockMessage();
+        return;
+    }
 
     audio.currentTime += 10;
 }
@@ -1213,6 +1303,23 @@ rewindButton.onclick = handleRewind;
 sheetRewindButton.onclick = handleRewind;
 forwardButton.onclick = handleForward;
 sheetForwardButton.onclick = handleForward;
+sharePageButton.onclick = sharePage;
+shareStationButton.onclick = shareStation;
+recordButton.onclick = toggleRecording;
+bugReportButton.onclick = openBugReport;
+cancelBugReportButton.onclick = ()=>closeDialog(bugReportModal);
+copyBugEmailButton.onclick = copyBugEmail;
+closeShareNoticeButton.onclick = ()=>closeDialog(shareNoticeModal);
+bugReportModal.onclick = event=>{
+    if(event.target === bugReportModal){
+        closeDialog(bugReportModal);
+    }
+};
+shareNoticeModal.onclick = event=>{
+    if(event.target === shareNoticeModal){
+        closeDialog(shareNoticeModal);
+    }
+};
 
 
 
@@ -1508,10 +1615,12 @@ audio.volume;
 translatePage();
 updatePlayerUi();
 updatePlaybackButtonState();
+setStatus(translations[language].ready, "ready");
 
 loadCountries();
 loadGenres();
 loadStations();
+loadStationFromUrl();
 displayFavorites();
 displayRecent();
 
@@ -1527,11 +1636,13 @@ if(savedStation){
     stationName.textContent =
     currentStation.name;
 
+    updatePlayerUi();
+
 }
 
 if("serviceWorker" in navigator){
 
-    navigator.serviceWorker.register("./sw.js")
+    navigator.serviceWorker.register("./sw.js?v=6")
     .then(()=>{
 
         console.log("Service Worker registered");
@@ -1547,9 +1658,3 @@ if("serviceWorker" in navigator){
     });
 
 }
-
-
-
-
-
-
