@@ -1,6 +1,7 @@
 const api = "https://de1.api.radio-browser.info/json";
 
 const audio = document.getElementById("audioPlayer");
+audio.crossOrigin = "anonymous";
 
 const searchInput = document.getElementById("searchInput");
 const searchButton = document.getElementById("searchButton");
@@ -119,6 +120,10 @@ let mediaRecorder = null;
 let recordingChunks = [];
 
 let isRecording = false;
+
+let audioContext = null;
+
+let recordingSource = null;
 
 let language =
 localStorage.getItem("language") || "en";
@@ -265,35 +270,69 @@ function downloadRecording(){
     const link = document.createElement("a");
     const stationName = (currentStation && currentStation.name) || "nova-radio";
     const filename = stationName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "nova-radio";
+    const extension = type.includes("mp4") || type.includes("aac") ? "m4a" : type.includes("ogg") ? "ogg" : "webm";
 
     link.href = downloadUrl;
-    link.download = `${filename}-${Date.now()}.webm`;
+    link.download = `${filename}-${Date.now()}.${extension}`;
     link.click();
     URL.revokeObjectURL(downloadUrl);
     recordingChunks = [];
     setStatus(translations[language].recordingSaved, "ready");
 }
 
-function startRecording(){
+async function getRecordingStream(){
+    const captureStream = audio.captureStream || audio.mozCaptureStream;
+    if(captureStream){
+        return captureStream.call(audio);
+    }
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if(!AudioContextClass){
+        return null;
+    }
+
+    if(!audioContext){
+        audioContext = new AudioContextClass();
+        recordingSource = audioContext.createMediaElementSource(audio);
+        recordingSource.connect(audioContext.destination);
+    }
+
+    if(audioContext.state === "suspended"){
+        await audioContext.resume();
+    }
+
+    const destination = audioContext.createMediaStreamDestination();
+    recordingSource.connect(destination);
+    return destination.stream;
+}
+
+async function startRecording(){
     if(!currentStation || audio.paused){
         window.alert(translations[language].startRadioFirst);
         return;
     }
 
-    const captureStream = audio.captureStream || audio.mozCaptureStream;
-    if(!captureStream || !window.MediaRecorder){
+    if(!window.MediaRecorder){
         window.alert(translations[language].recordingUnavailable);
         return;
     }
 
     try {
-        const stream = captureStream.call(audio);
+        const stream = await getRecordingStream();
+        if(!stream){
+            throw new Error("Audio recording is unavailable");
+        }
         if(stream.getAudioTracks().length === 0){
             throw new Error("No audio track");
         }
 
-        const mimeType = ["audio/webm;codecs=opus", "audio/webm"]
-        .find(type=>MediaRecorder.isTypeSupported(type));
+        const mimeType = [
+            "audio/webm;codecs=opus",
+            "audio/webm",
+            "audio/ogg;codecs=opus",
+            "audio/mp4",
+            "audio/aac"
+        ].find(type=>MediaRecorder.isTypeSupported(type));
         mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
         recordingChunks = [];
         mediaRecorder.ondataavailable = event=>{
@@ -1642,7 +1681,7 @@ if(savedStation){
 
 if("serviceWorker" in navigator){
 
-    navigator.serviceWorker.register("./sw.js?v=6")
+    navigator.serviceWorker.register("./sw.js?v=9")
     .then(()=>{
 
         console.log("Service Worker registered");
