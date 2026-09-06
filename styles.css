@@ -550,7 +550,7 @@ select option:hover {
 .player-icon-button.primary {
   min-width: 50px;
   min-height: 50px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: #2563eb;
 }
 
 .player-icon-button.recording-locked {

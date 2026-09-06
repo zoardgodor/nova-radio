@@ -1,14 +1,14 @@
-const CACHE_NAME = "nova-radio-v11";
+const CACHE_NAME = "nova-radio-v12";
 
 const FILES = [
-    "./?v=11",
-    "./index.html?v=11",
-    "./styles.css?v=11",
-    "./script.js?v=11",
-    "./translations.js?v=11",
-    "./manifest.json?v=11",
-    "./icon-192.png?v=11",
-    "./icon-512.png?v=11"
+    "./?v=12",
+    "./index.html?v=12",
+    "./styles.css?v=12",
+    "./script.js?v=12",
+    "./translations.js?v=12",
+    "./manifest.json?v=12",
+    "./icon-192.png?v=12",
+    "./icon-512.png?v=12"
 ];
 
 
