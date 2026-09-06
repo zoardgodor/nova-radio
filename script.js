@@ -115,9 +115,11 @@ let retryTimer = null;
 
 let manualStop = false;
 
-let mediaRecorder = null;
+let mp3Encoder = null;
 
-let recordingChunks = [];
+let mp3Chunks = [];
+
+let recordingProcessor = null;
 
 let isRecording = false;
 
@@ -260,32 +262,25 @@ function updateRecordingUi(){
 }
 
 function downloadRecording(){
-    if(recordingChunks.length === 0){
+    if(mp3Chunks.length === 0){
         return;
     }
 
-    const type = mediaRecorder && mediaRecorder.mimeType ? mediaRecorder.mimeType : "audio/webm";
-    const recording = new Blob(recordingChunks, { type });
+    const recording = new Blob(mp3Chunks, { type: "audio/mpeg" });
     const downloadUrl = URL.createObjectURL(recording);
     const link = document.createElement("a");
     const stationName = (currentStation && currentStation.name) || "nova-radio";
     const filename = stationName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "nova-radio";
-    const extension = type.includes("mp4") || type.includes("aac") ? "m4a" : type.includes("ogg") ? "ogg" : "webm";
 
     link.href = downloadUrl;
-    link.download = `${filename}-${Date.now()}.${extension}`;
+    link.download = `${filename}-${Date.now()}.mp3`;
     link.click();
     URL.revokeObjectURL(downloadUrl);
-    recordingChunks = [];
+    mp3Chunks = [];
     setStatus(translations[language].recordingSaved, "ready");
 }
 
-async function getRecordingStream(){
-    const captureStream = audio.captureStream || audio.mozCaptureStream;
-    if(captureStream){
-        return captureStream.call(audio);
-    }
-
+async function getRecordingAudioContext(){
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if(!AudioContextClass){
         return null;
@@ -301,9 +296,7 @@ async function getRecordingStream(){
         await audioContext.resume();
     }
 
-    const destination = audioContext.createMediaStreamDestination();
-    recordingSource.connect(destination);
-    return destination.stream;
+    return audioContext;
 }
 
 async function startRecording(){
@@ -312,51 +305,62 @@ async function startRecording(){
         return;
     }
 
-    if(!window.MediaRecorder){
+    if(!window.lamejs){
         window.alert(translations[language].recordingUnavailable);
         return;
     }
 
     try {
-        const stream = await getRecordingStream();
-        if(!stream){
+        const context = await getRecordingAudioContext();
+        if(!context){
             throw new Error("Audio recording is unavailable");
         }
-        if(stream.getAudioTracks().length === 0){
-            throw new Error("No audio track");
-        }
-
-        const mimeType = [
-            "audio/webm;codecs=opus",
-            "audio/webm",
-            "audio/ogg;codecs=opus",
-            "audio/mp4",
-            "audio/aac"
-        ].find(type=>MediaRecorder.isTypeSupported(type));
-        mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
-        recordingChunks = [];
-        mediaRecorder.ondataavailable = event=>{
-            if(event.data.size > 0){
-                recordingChunks.push(event.data);
+        mp3Encoder = new lamejs.Mp3Encoder(1, context.sampleRate, 128);
+        mp3Chunks = [];
+        recordingProcessor = context.createScriptProcessor(4096, 1, 1);
+        recordingProcessor.onaudioprocess = event=>{
+            if(!isRecording || !mp3Encoder){
+                return;
+            }
+            const samples = event.inputBuffer.getChannelData(0);
+            const pcm = new Int16Array(samples.length);
+            for(let index = 0; index < samples.length; index++){
+                const sample = Math.max(-1, Math.min(1, samples[index]));
+                pcm[index] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+            }
+            const encoded = mp3Encoder.encodeBuffer(pcm);
+            if(encoded.length > 0){
+                mp3Chunks.push(new Int8Array(encoded));
             }
         };
-        mediaRecorder.onstop = downloadRecording;
-        mediaRecorder.start();
+        recordingSource.connect(recordingProcessor);
+        recordingProcessor.connect(context.destination);
         isRecording = true;
         updateRecordingUi();
         setStatus(translations[language].recordingStarted, "playing");
     } catch(error) {
-        mediaRecorder = null;
+        mp3Encoder = null;
+        recordingProcessor = null;
         window.alert(translations[language].recordingUnavailable);
     }
 }
 
 function stopRecording(){
-    if(mediaRecorder && mediaRecorder.state !== "inactive"){
-        mediaRecorder.stop();
+    if(recordingProcessor){
+        recordingProcessor.disconnect();
+        recordingProcessor.onaudioprocess = null;
+        recordingProcessor = null;
+    }
+    if(mp3Encoder){
+        const finalChunk = mp3Encoder.flush();
+        if(finalChunk.length > 0){
+            mp3Chunks.push(new Int8Array(finalChunk));
+        }
+        mp3Encoder = null;
     }
     isRecording = false;
     updateRecordingUi();
+    downloadRecording();
 }
 
 function toggleRecording(){
