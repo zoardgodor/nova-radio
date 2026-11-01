@@ -1,7 +1,7 @@
 const translations = {
   en: {
     menu: "Menu",
-    version: "Version v8",
+    version: "Version v9",
     favorites: "Favorites",
     showFavorites: "Show Favorites",
     language: "Language",
@@ -78,7 +78,7 @@ const translations = {
   },
   hu: {
     menu: "Menü",
-    version: "Verzió v8",
+    version: "Verzió v9",
     favorites: "Kedvencek",
     showFavorites: "Kedvencek megjelenítése",
     language: "Nyelv",

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json?v=9">
-  <meta name="theme-color" content="#00c6ff">
+  <link rel="manifest" href="manifest.json?v=10">
+  <meta name="theme-color" content="#ff7a00">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Nova Radio</title>
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
   <link rel="preconnect" href="https://de1.api.radio-browser.info">
 </head>
 <body>
@@ -15,12 +15,12 @@
   <aside id="sidebar" class="sidebar">
     <div class="sidebar-header">
       <h2>Nova Radio</h2>
-      <button id="closeMenuButton" class="sidebar-close" type="button" data-i18n-aria-label="close" aria-label="Close">✕</button>
+      <button id="closeMenuButton" class="sidebar-close" type="button" data-i18n-aria-label="close" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
     </div>
 
     <div class="sidebar-content">
       <div class="menu-group sidebar-actions">
-        <button id="sharePageButton" class="menu-button share-button" type="button" data-i18n-aria-label="share" data-i18n-title="share" aria-label="Share" title="Share">⤴</button>
+        <button id="sharePageButton" class="menu-button share-button" type="button" data-i18n-aria-label="share" data-i18n-title="share" aria-label="Share" title="Share"><svg class="icon" aria-hidden="true"><use href="#icon-share"></use></svg></button>
         <button id="recordButton" class="menu-button record-button" type="button" data-i18n-aria-label="startRecording" data-i18n-title="startRecording" aria-label="Start recording" title="Start recording"><span class="record-indicator"></span></button>
       </div>
 
@@ -55,26 +55,21 @@
       </div>
 
       <div class="menu-group">
-        <h3 data-i18n="language">Language</h3>
-        <div class="language-buttons">
-          <button id="englishButton" class="language-button" type="button">English</button>
-          <button id="hungarianButton" class="language-button" type="button">Magyar</button>
-        </div>
+        <label for="languageSelect" data-i18n="language">Language</label>
+        <select id="languageSelect">
+          <option value="en">English</option>
+          <option value="hu">Magyar</option>
+        </select>
       </div>
 
-      <div class="menu-group">
-        <h3>Nova Radio</h3>
-        <p data-i18n="version">Version v8</p>
-      </div>
-
-      <button id="bugReportButton" class="bug-report-button" type="button" data-i18n-aria-label="reportBug" data-i18n-title="reportBug" aria-label="Report a bug" title="Report a bug">🪲</button>
+      <button id="bugReportButton" class="bug-report-button" type="button" data-i18n-aria-label="reportBug" data-i18n-title="reportBug" aria-label="Report a bug" title="Report a bug"><svg class="icon" aria-hidden="true"><use href="#icon-bug"></use></svg></button>
     </div>
   </aside>
 
   <div class="app">
     <header class="header">
       <div class="top-bar">
-        <button id="menuButton" class="menu-button" type="button">☰</button>
+        <button id="menuButton" class="menu-button" type="button" aria-label="Open menu"><svg class="icon" aria-hidden="true"><use href="#icon-menu"></use></svg></button>
         <h1>Nova Radio</h1>
       </div>
       <p data-i18n="subtitle">Online Internet Radio Player</p>
@@ -96,7 +91,7 @@
     </section>
 
     <section class="now-playing">
-      <div id="stationIcon" class="station-icon">♫</div>
+      <div id="stationIcon" class="station-icon"><svg class="icon" aria-hidden="true"><use href="#icon-music"></use></svg></div>
       <div class="station-info">
         <h2 id="stationName">No station selected</h2>
         <p id="nowPlaying">Nothing playing</p>
@@ -119,7 +114,7 @@
 
   <div id="playerBar" class="player-bar" role="button" tabindex="0" data-i18n-aria-label="openPlayer" aria-label="Open player details">
     <div class="player-bar-main">
-      <div id="playerBarIcon" class="player-bar-icon">♫</div>
+      <div id="playerBarIcon" class="player-bar-icon"><svg class="icon" aria-hidden="true"><use href="#icon-music"></use></svg></div>
       <div class="player-bar-text">
         <div id="playerBarStation" class="player-bar-station">No station selected</div>
         <div id="playerBarMeta" class="player-bar-meta">Nothing playing</div>
@@ -127,17 +122,17 @@
       </div>
       <div class="player-bar-actions">
         <button id="rewindButton" class="player-icon-button" type="button" data-i18n-aria-label="rewind" aria-label="Rewind 10 seconds">
-          <span class="player-icon">⏪</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-rewind"></use></svg></span>
           <span class="player-icon-label">10</span>
         </button>
         <button id="playButton" class="player-icon-button primary" type="button" data-i18n-aria-label="play" aria-label="Play">
-          <span class="player-icon">▶</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg></span>
         </button>
         <button id="stopButton" class="player-icon-button" type="button" data-i18n-aria-label="stop" aria-label="Stop">
-          <span class="player-icon">■</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-stop"></use></svg></span>
         </button>
         <button id="forwardButton" class="player-icon-button" type="button" data-i18n-aria-label="forward" aria-label="Forward 10 seconds">
-          <span class="player-icon">⏩</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-forward"></use></svg></span>
           <span class="player-icon-label">10</span>
         </button>
       </div>
@@ -145,9 +140,9 @@
   </div>
 
   <div id="playerSheet" class="player-sheet" aria-hidden="true">
-    <button id="closePlayerSheet" class="player-sheet-close" type="button" data-i18n-aria-label="close" aria-label="Close">V</button>
+    <button id="closePlayerSheet" class="player-sheet-close" type="button" data-i18n-aria-label="close" aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#icon-close"></use></svg></button>
     <div class="player-sheet-header">
-      <div id="playerSheetIcon" class="player-sheet-icon">♫</div>
+      <div id="playerSheetIcon" class="player-sheet-icon"><svg class="icon" aria-hidden="true"><use href="#icon-music"></use></svg></div>
       <div class="player-sheet-info">
         <h3 id="playerSheetStation">No station selected</h3>
         <p id="playerSheetMeta">Nothing playing</p>
@@ -157,19 +152,19 @@
     <div class="player-sheet-body">
       <div class="player-sheet-controls">
         <button id="sheetRewindButton" class="player-icon-button" type="button" data-i18n-aria-label="rewind" aria-label="Rewind 10 seconds">
-          <span class="player-icon">⏪</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-rewind"></use></svg></span>
         </button>
         <button id="sheetPlayButton" class="player-icon-button primary" type="button" data-i18n-aria-label="play" aria-label="Play">
-          <span class="player-icon">▶</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-play"></use></svg></span>
         </button>
         <button id="sheetStopButton" class="player-icon-button" type="button" data-i18n-aria-label="stop" aria-label="Stop">
-          <span class="player-icon">■</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-stop"></use></svg></span>
         </button>
         <button id="sheetForwardButton" class="player-icon-button" type="button" data-i18n-aria-label="forward" aria-label="Forward 10 seconds">
-          <span class="player-icon">⏩</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-forward"></use></svg></span>
         </button>
         <button id="shareStationButton" class="player-icon-button" type="button" data-i18n-aria-label="shareStation" data-i18n-title="shareStation" aria-label="Share station" title="Share station">
-          <span class="player-icon">⤴</span>
+          <span class="player-icon"><svg class="icon" aria-hidden="true"><use href="#icon-share"></use></svg></span>
         </button>
       </div>
       <div class="player-sheet-row">
@@ -213,8 +208,21 @@
 
   <audio id="audioPlayer" preload="none"></audio>
 
-  <script src="translations.js?v=13"></script>
+  <svg class="icon-sprite" aria-hidden="true">
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></symbol>
+    <symbol id="icon-share" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 14v5h14v-5"></path></symbol>
+    <symbol id="icon-bug" viewBox="0 0 24 24"><path d="M9 8V5m6 3V5M7 11H4m16 0h-3M8 16l-2 3m10-3 2 3M8 8h8l1 5a5 5 0 0 1-10 0l1-5Z"></path></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></symbol>
+    <symbol id="icon-music" viewBox="0 0 24 24"><path d="M9 18V5l10-2v13M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3Zm10-2a3 3 0 1 1-3-3 3 3 0 0 1 3 3Z"></path></symbol>
+    <symbol id="icon-rewind" viewBox="0 0 24 24"><path d="m11 7-5 5 5 5V7Zm7 0-5 5 5 5V7Z"></path></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"></path></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M7 5h4v14H7zM13 5h4v14h-4z"></path></symbol>
+    <symbol id="icon-stop" viewBox="0 0 24 24"><path d="M6 6h12v12H6z"></path></symbol>
+    <symbol id="icon-forward" viewBox="0 0 24 24"><path d="m13 7 5 5-5 5V7ZM6 7l5 5-5 5V7Z"></path></symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24"><path d="m12 4 2.5 5.2 5.7.8-4.1 4 1 5.7-5.1-2.7-5.1 2.7 1-5.7-4.1-4 5.7-.8L12 4Z"></path></symbol>
+  </svg>
+  <script src="translations.js?v=14"></script>
   <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.all.js"></script>
-  <script src="script.js?v=13"></script>
+  <script src="script.js?v=14"></script>
 </body>
 </html>
