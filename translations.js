@@ -1,7 +1,7 @@
 const forditasok = {
   en: {
     menu: "Menu",
-    version: "Version v10",
+    version: "Version v16",
     favorites: "Favorites",
     showFavorites: "Show Favorites",
     language: "Language",
@@ -78,7 +78,7 @@ const forditasok = {
   },
   hu: {
     menu: "Menü",
-    version: "Verzió v10",
+    version: "Verzió v16",
     favorites: "Kedvencek",
     showFavorites: "Kedvencek megjelenítése",
     language: "Nyelv",

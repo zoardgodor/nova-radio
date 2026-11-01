@@ -1,14 +1,14 @@
-const gyorsitotar_neve = "nova-radio-v15";
+const gyorsitotar_neve = "nova-radio-v16";
 
 const fajlok = [
-    "./?v=15",
-    "./index.html?v=15",
-    "./styles.css?v=15",
-    "./script.js?v=15",
-    "./translations.js?v=15",
-    "./manifest.json?v=15",
-    "./icon-192.png?v=15",
-    "./icon-512.png?v=15"
+    "./?v=16",
+    "./index.html?v=16",
+    "./styles.css?v=16",
+    "./script.js?v=16",
+    "./translations.js?v=16",
+    "./manifest.json?v=16",
+    "./icon-192.png?v=16",
+    "./icon-512.png?v=16"
 ];
 
 

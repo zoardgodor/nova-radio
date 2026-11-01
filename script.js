@@ -1687,7 +1687,7 @@ if(mentettallomas){
 
 if("serviceWorker" in navigator){
 
-    navigator.serviceWorker.register("./sw.js?v=11")
+    navigator.serviceWorker.register("./sw.js?v=16")
     .then(()=>{
 
         console.log("Service Worker registered");
