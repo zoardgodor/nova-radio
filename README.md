@@ -1,4 +1,4 @@
-# Nova Radio Player 🎧
+# Nova Radio Player
 
 A modern, dark-themed internet radio player built with pure HTML, CSS and JavaScript.
 
@@ -6,17 +6,17 @@ Nova Radio uses the Radio Browser API to search and play thousands of online rad
 
 ## Features
 
-- 🔎 Search internet radio stations
-- 🌍 Filter stations by country
-- 🎵 Filter stations by genre
-- ▶️ Play and pause radio streams
-- 🔊 Volume control
-- ⭐ Save favorite stations locally
-- 📥 Load more stations dynamically
-- 📱 Responsive mobile-friendly design
-- 🔗 Share the app or a station with the Web Share API or clipboard fallback
-- 🪲 Report bugs by copying the support email address from the menu
-- 🌐 English and Hungarian interface translations
+- Search internet radio stations
+- Filter stations by country
+- Filter stations by genre
+- Play and pause radio streams
+- Volume control
+- Save favorite stations locally
+- Load more stations dynamically
+- Responsive mobile-friendly design
+- Share the app or a station with the Web Share API or clipboard fallback
+- Report bugs by copying the support email address from the menu
+- English and Hungarian interface translations
 
 ## Technologies
 
