@@ -41,8 +41,7 @@ const closeMenuButton = document.getElementById("closeMenuButton");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 
-const englishButton = document.getElementById("englishButton");
-const hungarianButton = document.getElementById("hungarianButton");
+const languageSelect = document.getElementById("languageSelect");
 
 const playerBarStation = document.getElementById("playerBarStation");
 const playerBarMeta = document.getElementById("playerBarMeta");
@@ -79,6 +78,20 @@ const shareNoticeModal = document.getElementById("shareNoticeModal");
 const closeShareNoticeButton = document.getElementById("closeShareNoticeButton");
 
 const bugReportEmail = "zoardgodor@duck.com";
+
+function createIcon(name){
+    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.classList.add("icon");
+    icon.setAttribute("aria-hidden", "true");
+    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttribute("href", `#icon-${name}`);
+    icon.appendChild(use);
+    return icon;
+}
+
+function setIcon(element, name){
+    element.replaceChildren(createIcon(name));
+}
 
 function setPlayerSheetOpen(open){
     if(open){
@@ -209,12 +222,12 @@ function updatePlayerUi(){
             img.loading = "lazy";
             img.onerror = ()=>{
                 img.remove();
-                element.textContent = "♫";
+                setIcon(element, "music");
             };
             element.appendChild(img);
             element.classList.add("has-image");
         } else {
-            element.textContent = "♫";
+            setIcon(element, "music");
         }
     });
 }
@@ -229,7 +242,7 @@ function updatePlaybackButtonState(){
     playButtons.forEach(button => {
         const icon = button.querySelector(".player-icon");
         if(icon){
-            icon.textContent = shouldShowPause ? "❚❚" : "▶";
+            setIcon(icon, shouldShowPause ? "pause" : "play");
         }
         button.setAttribute("aria-label", translations[language][shouldShowPause ? "pause" : "play"]);
     });
@@ -908,11 +921,11 @@ function createCard(station,compact=false){
         image.loading = "lazy";
         image.onerror = ()=>{
             image.remove();
-            icon.textContent = "♫";
+            setIcon(icon, "music");
         };
         icon.appendChild(image);
     } else {
-        icon.textContent = "♫";
+        setIcon(icon, "music");
     }
 
     const content = document.createElement("div");
@@ -939,7 +952,7 @@ function createCard(station,compact=false){
     const favoriteButton = document.createElement("button");
     favoriteButton.className = `favorite-button ${isFavorite(station.stationuuid) ? "active" : ""}`;
     favoriteButton.type = "button";
-    favoriteButton.textContent = "★";
+    favoriteButton.appendChild(createIcon("star"));
     favoriteButton.title = translations[language][isFavorite(station.stationuuid) ? "removeFromFavorites" : "addToFavorites"];
 
     row.appendChild(icon);
@@ -1632,20 +1645,8 @@ playerBar.addEventListener("keydown", event=>{
 
 
 
-englishButton.onclick =
-()=>{
-
-    setLanguage("en");
-
-};
-
-
-
-hungarianButton.onclick =
-()=>{
-
-    setLanguage("hu");
-
+languageSelect.onchange = ()=>{
+    setLanguage(languageSelect.value);
 };
 
 
@@ -1653,6 +1654,7 @@ hungarianButton.onclick =
 volumeSlider.value =
 audio.volume;
 
+languageSelect.value = language;
 
 
 translatePage();
@@ -1685,7 +1687,7 @@ if(savedStation){
 
 if("serviceWorker" in navigator){
 
-    navigator.serviceWorker.register("./sw.js?v=9")
+    navigator.serviceWorker.register("./sw.js?v=10")
     .then(()=>{
 
         console.log("Service Worker registered");

@@ -4,8 +4,8 @@
   --panel: #151922;
   --border: rgba(255,255,255,0.08);
   --muted: #8c93a4;
-  --accent: #53d5ff;
-  --accent-2: #8e6dff;
+  --accent: #ff7a00;
+  --accent-2: #ff7a00;
   --text: #f3f4f8;
 }
 
@@ -23,7 +23,7 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(180deg, #0b0f17 0%, #151922 100%);
+  background: #0b0f17;
   color: var(--text);
 }
 
@@ -222,12 +222,12 @@ select option {
 
 select option:checked,
 select option:hover {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  background: var(--accent);
   color: #ffffff;
 }
 
 .search-row button {
-  background: #2563eb;
+  background: var(--accent);
   color: white;
   padding: 10px 14px;
   border-radius: 0;
@@ -287,7 +287,7 @@ select option:hover {
 }
 
 .dialog-button.primary {
-  background: #2563eb;
+  background: var(--accent);
   color: white;
 }
 
@@ -403,7 +403,7 @@ select option:hover {
 }
 
 .radio-row:hover {
-  background: rgba(83, 213, 255, 0.08);
+  background: rgba(255, 122, 0, 0.08);
 }
 
 .radio-row-icon {
@@ -550,7 +550,7 @@ select option:hover {
 .player-icon-button.primary {
   min-width: 50px;
   min-height: 50px;
-  background: #2563eb;
+  background: var(--accent);
 }
 
 .player-icon-button.recording-locked {
@@ -915,7 +915,7 @@ select option:hover {
 
     rgba(255,255,255,.15);
 
-    border-color:#00eaff;
+    border-color:var(--accent);
 
 }
 
@@ -969,7 +969,7 @@ select option:hover {
 
     background:
 
-    linear-gradient(135deg,#ffd700,#ff8c00);
+    #ff8c00;
 
 }
 
@@ -1031,6 +1031,53 @@ select option:hover {
 
         padding:10px 12px 150px;
 
+    }
+
+    .icon {
+      width: 1.25em;
+      height: 1.25em;
+      display: block;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .icon-sprite {
+      position: absolute;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    .player-icon .icon,
+    .share-button .icon,
+    .bug-report-button .icon {
+      width: 1.35em;
+      height: 1.35em;
+    }
+
+    .language-buttons {
+      display: none;
+    }
+
+    #languageSelect {
+      margin-top: 8px;
+    }
+
+    .menu-group > label {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    button:hover,
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
 
@@ -1274,4 +1321,51 @@ button:hover {
         align-items:flex-start;
         text-align:left;
     }
+}
+
+.icon {
+  width: 1.25em;
+  height: 1.25em;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.player-icon .icon,
+.share-button .icon,
+.bug-report-button .icon {
+  width: 1.35em;
+  height: 1.35em;
+}
+
+.language-buttons {
+  display: none;
+}
+
+#languageSelect {
+  margin-top: 8px;
+}
+
+.menu-group > label {
+  display: block;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+button:hover,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
