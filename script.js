@@ -1687,7 +1687,7 @@ if(savedStation){
 
 if("serviceWorker" in navigator){
 
-    navigator.serviceWorker.register("./sw.js?v=10")
+    navigator.serviceWorker.register("./sw.js?v=11")
     .then(()=>{
 
         console.log("Service Worker registered");

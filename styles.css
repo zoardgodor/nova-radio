@@ -235,7 +235,7 @@ select option:hover {
 
 .bug-report-button {
   display: block;
-  margin: auto 0 0 auto;
+  margin: 8px 0 0 auto;
   padding: 8px;
   background: transparent;
   color: var(--text);
