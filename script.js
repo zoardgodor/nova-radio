@@ -1,172 +1,172 @@
-const api = "https://de1.api.radio-browser.info/json";
+const radioapi = "https://de1.api.radio-browser.info/json";
 
-const audio = document.getElementById("audioPlayer");
-audio.crossOrigin = "anonymous";
+const hang = document.getElementById("audioPlayer");
+hang.crossOrigin = "anonymous";
 
-const searchInput = document.getElementById("searchInput");
-const searchButton = document.getElementById("searchButton");
+const keresobemenet = document.getElementById("searchInput");
+const keresogomb = document.getElementById("searchButton");
 
-const countryFilter = document.getElementById("countryFilter");
-const genreFilter = document.getElementById("genreFilter");
+const orszagszuro = document.getElementById("countryFilter");
+const mufajszuro = document.getElementById("genreFilter");
 
-const radioList = document.getElementById("radioList");
-const favoritesList = document.getElementById("favoritesList");
+const radiolista = document.getElementById("radioList");
+const kedvenclista = document.getElementById("favoritesList");
 
-const loading = document.getElementById("loading");
+const betoltes = document.getElementById("loading");
 
-const stationName = document.getElementById("stationName");
-const nowPlaying = document.getElementById("nowPlaying");
-const playerStatus = document.getElementById("playerStatus");
-const playerStatusSheet = document.getElementById("playerStatusSheet");
+const allomasneve = document.getElementById("stationName");
+const mostszol = document.getElementById("nowPlaying");
+const lejatszoallapot = document.getElementById("playerStatus");
+const lejatsolapallapot = document.getElementById("playerStatusSheet");
 
-const playButton = document.getElementById("playButton");
-const stopButton = document.getElementById("stopButton");
-const rewindButton = document.getElementById("rewindButton");
-const forwardButton = document.getElementById("forwardButton");
-const sheetPlayButton = document.getElementById("sheetPlayButton");
-const sheetStopButton = document.getElementById("sheetStopButton");
-const sheetRewindButton = document.getElementById("sheetRewindButton");
-const sheetForwardButton = document.getElementById("sheetForwardButton");
+const lejatszasgomb = document.getElementById("playButton");
+const leallitasgomb = document.getElementById("stopButton");
+const visszatekeresgomb = document.getElementById("rewindButton");
+const eloretekeresgomb = document.getElementById("forwardButton");
+const laplejatszasgomb = document.getElementById("sheetPlayButton");
+const lapleallitasgomb = document.getElementById("sheetStopButton");
+const lapvisszatekeresgomb = document.getElementById("sheetRewindButton");
+const lapeloretekeresgomb = document.getElementById("sheetForwardButton");
 
-const volumeSlider = document.getElementById("volumeSlider");
+const hangerocsuszka = document.getElementById("volumeSlider");
 
-const favoritesToggle = document.getElementById("favoritesToggle");
+const kedvenckapcsolo = document.getElementById("favoritesToggle");
 
-const favoritesDropdown = document.getElementById("favoritesDropdown");
+const kedvenclenyilo = document.getElementById("favoritesDropdown");
 
-const loadMoreButton = document.getElementById("loadMoreButton");
+const tovabbiakgomb = document.getElementById("loadMoreButton");
 
-const menuButton = document.getElementById("menuButton");
-const closeMenuButton = document.getElementById("closeMenuButton");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
+const menugomb = document.getElementById("menuButton");
+const menubezarogomb = document.getElementById("closeMenuButton");
+const oldalsav = document.getElementById("sidebar");
+const reteg = document.getElementById("overlay");
 
-const languageSelect = document.getElementById("languageSelect");
+const nyelvvalaszto = document.getElementById("languageSelect");
 
-const playerBarStation = document.getElementById("playerBarStation");
-const playerBarMeta = document.getElementById("playerBarMeta");
-const playerBarQuality = document.getElementById("playerBarQuality");
-const playerBarIcon = document.getElementById("playerBarIcon");
-const stationIcon = document.getElementById("stationIcon");
-const playerSheetStation = document.getElementById("playerSheetStation");
-const playerSheetMeta = document.getElementById("playerSheetMeta");
-const playerSheetProtocol = document.getElementById("playerSheetProtocol");
-const playerSheetStream = document.getElementById("playerSheetStream");
-const playerSheetQuality = document.getElementById("playerSheetQuality");
-const playerSheetIcon = document.getElementById("playerSheetIcon");
-const playerBar = document.getElementById("playerBar");
-const playerSheet = document.getElementById("playerSheet");
-const closePlayerSheet = document.getElementById("closePlayerSheet");
+const lejatszosavallomas = document.getElementById("playerBarStation");
+const lejatsosavmeta = document.getElementById("playerBarMeta");
+const lejatsosavminoseg = document.getElementById("playerBarQuality");
+const lejatsosavikon = document.getElementById("playerBarIcon");
+const allomasikon = document.getElementById("stationIcon");
+const lejatsolapallomas = document.getElementById("playerSheetStation");
+const lejatsolapmeta = document.getElementById("playerSheetMeta");
+const lejatsolapprotokoll = document.getElementById("playerSheetProtocol");
+const lejatsolapfolyam = document.getElementById("playerSheetStream");
+const lejatsolapminoseg = document.getElementById("playerSheetQuality");
+const lejatsolapikon = document.getElementById("playerSheetIcon");
+const lejatsosav = document.getElementById("playerBar");
+const lejatsolap = document.getElementById("playerSheet");
+const lejatsolapbezaro = document.getElementById("closePlayerSheet");
 
-const recentList = document.getElementById("recentList");
+const legutobbilista = document.getElementById("recentList");
 
-const recentToggle = document.getElementById("recentToggle");
+const legutobbikapcsolo = document.getElementById("recentToggle");
 
-const recentDropdown = document.getElementById("recentDropdown");
+const legutobbilenyilo = document.getElementById("recentDropdown");
 
-const clearRecentButton = document.getElementById("clearRecentButton");
+const legutobbitorlesgomb = document.getElementById("clearRecentButton");
 
-const sleepTimerSelect = document.getElementById("sleepTimerSelect");
-const sharePageButton = document.getElementById("sharePageButton");
-const shareStationButton = document.getElementById("shareStationButton");
-const recordButton = document.getElementById("recordButton");
-const bugReportButton = document.getElementById("bugReportButton");
-const bugReportModal = document.getElementById("bugReportModal");
-const cancelBugReportButton = document.getElementById("cancelBugReportButton");
-const copyBugEmailButton = document.getElementById("copyBugEmailButton");
-const shareNoticeModal = document.getElementById("shareNoticeModal");
-const closeShareNoticeButton = document.getElementById("closeShareNoticeButton");
+const elalvasidozitovalaszto = document.getElementById("sleepTimerSelect");
+const oldalmegosztogomb = document.getElementById("sharePageButton");
+const allomasmegosztogomb = document.getElementById("shareStationButton");
+const rogzitogomb = document.getElementById("recordButton");
+const hibajelentesgomb = document.getElementById("bugReportButton");
+const hibajelentesablak = document.getElementById("bugReportModal");
+const hibajelentesmegsemegomb = document.getElementById("cancelBugReportButton");
+const hibajelentesmasologomb = document.getElementById("copyBugEmailButton");
+const megosztasieritesablak = document.getElementById("shareNoticeModal");
+const megosztasieritesbezarogomb = document.getElementById("closeShareNoticeButton");
 
-const bugReportEmail = "zoardgodor@duck.com";
+const hibajelentesemail = "zoardgodor@duck.com";
 
-function createIcon(name){
-    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    icon.classList.add("icon");
-    icon.setAttribute("aria-hidden", "true");
-    const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
-    use.setAttribute("href", `#icon-${name}`);
-    icon.appendChild(use);
-    return icon;
+function ikonletrehozas(nev){
+    const ikon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    ikon.classList.add("icon");
+    ikon.setAttribute("aria-hidden", "true");
+    const hasznalat = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    hasznalat.setAttribute("href", `#icon-${nev}`);
+    ikon.appendChild(hasznalat);
+    return ikon;
 }
 
-function setIcon(element, name){
-    element.replaceChildren(createIcon(name));
+function ikonbeallitas(elem, nev){
+    elem.replaceChildren(ikonletrehozas(nev));
 }
 
-function setPlayerSheetOpen(open){
-    if(open){
-        playerSheet.classList.add("open");
-        playerSheet.setAttribute("aria-hidden", "false");
+function lejatsolapnyitasbeallitas(nyitva){
+    if(nyitva){
+        lejatsolap.classList.add("open");
+        lejatsolap.setAttribute("aria-hidden", "false");
     } else {
-        playerSheet.classList.remove("open");
-        playerSheet.setAttribute("aria-hidden", "true");
+        lejatsolap.classList.remove("open");
+        lejatsolap.setAttribute("aria-hidden", "true");
     }
 }
 
 
-let stations = [];
+let allomasok = [];
 
-let currentStation = null;
+let jelenlegiallomas = null;
 
-let currentStreamUrl = null;
+let jelenlegifolyamurl = null;
 
-let userPaused = false;
+let felhasznaloszuneteltetett = false;
 
-let currentStatus = "ready";
+let jelenlegiallapot = "ready";
 
-let page = 0;
+let oldal = 0;
 
-const pageSize = 100;
+const oldalmeret = 100;
 
-let sleepTimer = null;
+let elalvasidozito = null;
 
-let retryTimes = [3000,5000,10000,15000,20000,30000];
+let ujraprobalasiidok = [3000,5000,10000,15000,20000,30000];
 
-let retryIndex = 0;
+let ujraprobalasiindex = 0;
 
-let retryTimer = null;
+let ujraprobalasiidozito = null;
 
-let manualStop = false;
+let kezialleallitas = false;
 
-let mp3Encoder = null;
+let mp3kodolo = null;
 
-let mp3Chunks = [];
+let mp3darabok = [];
 
-let recordingProcessor = null;
+let rogzitofeldolgozo = null;
 
-let isRecording = false;
+let rogzitesfolyamatban = false;
 
-let audioContext = null;
+let hangkornyezet = null;
 
-let recordingSource = null;
+let rogzitesforras = null;
 
-let language =
+let nyelv =
 localStorage.getItem("language") || "en";
 
 
-const savedVolume = localStorage.getItem("volume");
+const mentetthangero = localStorage.getItem("volume");
 
-audio.volume = savedVolume !== null
-    ? Number(savedVolume)
+hang.volume = mentetthangero !== null
+    ? Number(mentetthangero)
     : 0.7;
 
 
-function getPlaybackUrl(url){
-    if(!url){
+function lejatszasiurllekero(urlcim){
+    if(!urlcim){
         return null;
     }
 
-    return url;
+    return urlcim;
 }
 
-function getStationIcon(station){
+function allomasikonlekero(allomas){
 
     if(
-        station.favicon &&
-        /^https?:\/\//i.test(station.favicon)
+        allomas.favicon &&
+        /^https?:\/\//i.test(allomas.favicon)
     ){
 
-        return station.favicon;
+        return allomas.favicon;
 
     }
 
@@ -175,385 +175,385 @@ function getStationIcon(station){
 }
 
 
-function setTextWithTitle(element,text){
-    const value = text || "";
-    element.textContent = value;
-    element.title = value;
+function szovegcimmelbeallitas(elem,szoveg){
+    const ertek = szoveg || "";
+    elem.textContent = ertek;
+    elem.title = ertek;
 }
 
-function getStationQuality(station){
-    if(!station){
-        return translations[language].qualityUnavailable;
+function allomasminoseglekero(allomas){
+    if(!allomas){
+        return forditasok[nyelv].qualityUnavailable;
     }
 
-    const parts = [];
-    if(station.codec){
-        parts.push(station.codec.toUpperCase());
+    const reszek = [];
+    if(allomas.codec){
+        reszek.push(allomas.codec.toUpperCase());
     }
-    if(Number(station.bitrate) > 0){
-        parts.push(`${station.bitrate} kbps`);
+    if(Number(allomas.bitrate) > 0){
+        reszek.push(`${allomas.bitrate} kbps`);
     }
-    return parts.length ? parts.join(" · ") : translations[language].qualityUnavailable;
+    return reszek.length ? reszek.join(" · ") : forditasok[nyelv].qualityUnavailable;
 }
 
-function updatePlayerUi(){
-    const label = currentStation ? currentStation.name : translations[language].noStationSelected;
-    const meta = currentStation ? (nowPlaying.textContent || translations[language].nothingPlaying) : translations[language].nothingPlaying;
-    const iconUrl = currentStation ? getStationIcon(currentStation) : "";
-    const activeUrl = currentStreamUrl || (currentStation && currentStation.url_resolved) || "";
+function lejatszofeluletrissites(){
+    const cimke = jelenlegiallomas ? jelenlegiallomas.name : forditasok[nyelv].noStationSelected;
+    const metaadat = jelenlegiallomas ? (mostszol.textContent || forditasok[nyelv].nothingPlaying) : forditasok[nyelv].nothingPlaying;
+    const ikonurl = jelenlegiallomas ? allomasikonlekero(jelenlegiallomas) : "";
+    const aktivurl = jelenlegifolyamurl || (jelenlegiallomas && jelenlegiallomas.url_resolved) || "";
 
-    stationName.textContent = label;
-    playerBarStation.textContent = label;
-    playerSheetStation.textContent = label;
-    playerBarMeta.textContent = meta;
-    playerSheetMeta.textContent = meta;
-    playerSheetProtocol.textContent = "";
-    playerSheetStream.textContent = activeUrl || "-";
-    playerBarQuality.textContent = getStationQuality(currentStation);
-    playerSheetQuality.textContent = getStationQuality(currentStation);
+    allomasneve.textContent = cimke;
+    lejatszosavallomas.textContent = cimke;
+    lejatsolapallomas.textContent = cimke;
+    lejatsosavmeta.textContent = metaadat;
+    lejatsolapmeta.textContent = metaadat;
+    lejatsolapprotokoll.textContent = "";
+    lejatsolapfolyam.textContent = aktivurl || "-";
+    lejatsosavminoseg.textContent = allomasminoseglekero(jelenlegiallomas);
+    lejatsolapminoseg.textContent = allomasminoseglekero(jelenlegiallomas);
 
-    [stationIcon, playerBarIcon, playerSheetIcon].forEach(element => {
-        element.innerHTML = "";
-        element.classList.remove("has-image");
-        if(iconUrl){
-            const img = document.createElement("img");
-            img.src = iconUrl;
-            img.alt = "";
-            img.loading = "lazy";
-            img.onerror = ()=>{
-                img.remove();
-                setIcon(element, "music");
+    [allomasikon, lejatsosavikon, lejatsolapikon].forEach(elem => {
+        elem.innerHTML = "";
+        elem.classList.remove("has-image");
+        if(ikonurl){
+            const kep = document.createElement("img");
+            kep.src = ikonurl;
+            kep.alt = "";
+            kep.loading = "lazy";
+            kep.onerror = ()=>{
+                kep.remove();
+                ikonbeallitas(elem, "music");
             };
-            element.appendChild(img);
-            element.classList.add("has-image");
+            elem.appendChild(kep);
+            elem.classList.add("has-image");
         } else {
-            setIcon(element, "music");
+            ikonbeallitas(elem, "music");
         }
     });
 }
 
-function updatePlaybackButtonState(){
-    const playButtons = [playButton, sheetPlayButton].filter(Boolean);
-    if(playButtons.length === 0){
+function lejatszasgombfrissitese(){
+    const lejatszasgombok = [lejatszasgomb, laplejatszasgomb].filter(Boolean);
+    if(lejatszasgombok.length === 0){
         return;
     }
 
-    const shouldShowPause = !!currentStation && !audio.paused && !userPaused;
-    playButtons.forEach(button => {
-        const icon = button.querySelector(".player-icon");
-        if(icon){
-            setIcon(icon, shouldShowPause ? "pause" : "play");
+    const szunetmutatasa = !!jelenlegiallomas && !hang.paused && !felhasznaloszuneteltetett;
+    lejatszasgombok.forEach(gomb => {
+        const ikon = gomb.querySelector(".player-icon");
+        if(ikon){
+            ikonbeallitas(ikon, szunetmutatasa ? "pause" : "play");
         }
-        button.setAttribute("aria-label", translations[language][shouldShowPause ? "pause" : "play"]);
+        gomb.setAttribute("aria-label", forditasok[nyelv][szunetmutatasa ? "pause" : "play"]);
     });
 }
 
-function showRecordingLockMessage(){
-    window.alert(translations[language].stopRecordingFirst);
+function rogziteszarolasuzenet(){
+    window.alert(forditasok[nyelv].stopRecordingFirst);
 }
 
-function updateRecordingUi(){
-    const lockedButtons = [
-        playButton,
-        stopButton,
-        rewindButton,
-        forwardButton,
-        sheetPlayButton,
-        sheetStopButton,
-        sheetRewindButton,
-        sheetForwardButton
+function rogzitofeluletfrissites(){
+    const zaroltgombok = [
+        lejatszasgomb,
+        leallitasgomb,
+        visszatekeresgomb,
+        eloretekeresgomb,
+        laplejatszasgomb,
+        lapleallitasgomb,
+        lapvisszatekeresgomb,
+        lapeloretekeresgomb
     ];
 
-    lockedButtons.forEach(button=>{
-        button.classList.toggle("recording-locked", isRecording);
+    zaroltgombok.forEach(gomb=>{
+        gomb.classList.toggle("recording-locked", rogzitesfolyamatban);
     });
 
-    recordButton.classList.toggle("recording", isRecording);
-    const label = translations[language][isRecording ? "stopRecording" : "startRecording"];
-    recordButton.setAttribute("aria-label", label);
-    recordButton.title = label;
+    rogzitogomb.classList.toggle("recording", rogzitesfolyamatban);
+    const cimke = forditasok[nyelv][rogzitesfolyamatban ? "stopRecording" : "startRecording"];
+    rogzitogomb.setAttribute("aria-label", cimke);
+    rogzitogomb.title = cimke;
 }
 
-function downloadRecording(){
-    if(mp3Chunks.length === 0){
+function rogzitesletoltese(){
+    if(mp3darabok.length === 0){
         return;
     }
 
-    const recording = new Blob(mp3Chunks, { type: "audio/mpeg" });
-    const downloadUrl = URL.createObjectURL(recording);
-    const link = document.createElement("a");
-    const stationName = (currentStation && currentStation.name) || "nova-radio";
-    const filename = stationName.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "nova-radio";
+    const rogzites = new Blob(mp3darabok, { type: "audio/mpeg" });
+    const letoltesiurl = URL.createObjectURL(rogzites);
+    const hivatkozas = document.createElement("a");
+    const allomasneve = (jelenlegiallomas && jelenlegiallomas.name) || "nova-radio";
+    const fajlnev = allomasneve.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "nova-radio";
 
-    link.href = downloadUrl;
-    link.download = `${filename}-${Date.now()}.mp3`;
-    link.click();
-    URL.revokeObjectURL(downloadUrl);
-    mp3Chunks = [];
-    setStatus(translations[language].recordingSaved, "ready");
+    hivatkozas.href = letoltesiurl;
+    hivatkozas.download = `${fajlnev}-${Date.now()}.mp3`;
+    hivatkozas.click();
+    URL.revokeObjectURL(letoltesiurl);
+    mp3darabok = [];
+    allapotbeallitasa(forditasok[nyelv].recordingSaved, "ready");
 }
 
-async function getRecordingAudioContext(){
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if(!AudioContextClass){
+async function rogzitesihangkornyezetlekero(){
+    const hangkornyezetosztaly = window.AudioContext || window.webkitAudioContext;
+    if(!hangkornyezetosztaly){
         return null;
     }
 
-    if(!audioContext){
-        audioContext = new AudioContextClass();
-        recordingSource = audioContext.createMediaElementSource(audio);
-        recordingSource.connect(audioContext.destination);
+    if(!hangkornyezet){
+        hangkornyezet = new hangkornyezetosztaly();
+        rogzitesforras = hangkornyezet.createMediaElementSource(hang);
+        rogzitesforras.connect(hangkornyezet.destination);
     }
 
-    if(audioContext.state === "suspended"){
-        await audioContext.resume();
+    if(hangkornyezet.state === "suspended"){
+        await hangkornyezet.resume();
     }
 
-    return audioContext;
+    return hangkornyezet;
 }
 
-async function startRecording(){
-    if(!currentStation || audio.paused){
-        window.alert(translations[language].startRadioFirst);
+async function rogzitesinditasa(){
+    if(!jelenlegiallomas || hang.paused){
+        window.alert(forditasok[nyelv].startRadioFirst);
         return;
     }
 
     if(!window.lamejs){
-        window.alert(translations[language].recordingUnavailable);
+        window.alert(forditasok[nyelv].recordingUnavailable);
         return;
     }
 
     try {
-        const context = await getRecordingAudioContext();
-        if(!context){
+        const kornyezet = await rogzitesihangkornyezetlekero();
+        if(!kornyezet){
             throw new Error("Audio recording is unavailable");
         }
-        mp3Encoder = new lamejs.Mp3Encoder(1, context.sampleRate, 128);
-        mp3Chunks = [];
-        recordingProcessor = context.createScriptProcessor(4096, 1, 1);
-        recordingProcessor.onaudioprocess = event=>{
-            if(!isRecording || !mp3Encoder){
+        mp3kodolo = new lamejs.Mp3Encoder(1, kornyezet.sampleRate, 128);
+        mp3darabok = [];
+        rogzitofeldolgozo = kornyezet.createScriptProcessor(4096, 1, 1);
+        rogzitofeldolgozo.onaudioprocess = esemeny=>{
+            if(!rogzitesfolyamatban || !mp3kodolo){
                 return;
             }
-            const samples = event.inputBuffer.getChannelData(0);
-            const pcm = new Int16Array(samples.length);
-            for(let index = 0; index < samples.length; index++){
-                const sample = Math.max(-1, Math.min(1, samples[index]));
-                pcm[index] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+            const mintak = esemeny.inputBuffer.getChannelData(0);
+            const pcm = new Int16Array(mintak.length);
+            for(let index = 0; index < mintak.length; index++){
+                const minta = Math.max(-1, Math.min(1, mintak[index]));
+                pcm[index] = minta < 0 ? minta * 0x8000 : minta * 0x7fff;
             }
-            const encoded = mp3Encoder.encodeBuffer(pcm);
-            if(encoded.length > 0){
-                mp3Chunks.push(new Int8Array(encoded));
+            const kodolt = mp3kodolo.encodeBuffer(pcm);
+            if(kodolt.length > 0){
+                mp3darabok.push(new Int8Array(kodolt));
             }
         };
-        recordingSource.connect(recordingProcessor);
-        recordingProcessor.connect(context.destination);
-        isRecording = true;
-        updateRecordingUi();
-        setStatus(translations[language].recordingStarted, "playing");
-    } catch(error) {
-        mp3Encoder = null;
-        recordingProcessor = null;
-        window.alert(translations[language].recordingUnavailable);
+        rogzitesforras.connect(rogzitofeldolgozo);
+        rogzitofeldolgozo.connect(kornyezet.destination);
+        rogzitesfolyamatban = true;
+        rogzitofeluletfrissites();
+        allapotbeallitasa(forditasok[nyelv].recordingStarted, "playing");
+    } catch(hiba) {
+        mp3kodolo = null;
+        rogzitofeldolgozo = null;
+        window.alert(forditasok[nyelv].recordingUnavailable);
     }
 }
 
-function stopRecording(){
-    if(recordingProcessor){
-        recordingProcessor.disconnect();
-        recordingProcessor.onaudioprocess = null;
-        recordingProcessor = null;
+function rogzitesleallitasa(){
+    if(rogzitofeldolgozo){
+        rogzitofeldolgozo.disconnect();
+        rogzitofeldolgozo.onaudioprocess = null;
+        rogzitofeldolgozo = null;
     }
-    if(mp3Encoder){
-        const finalChunk = mp3Encoder.flush();
-        if(finalChunk.length > 0){
-            mp3Chunks.push(new Int8Array(finalChunk));
+    if(mp3kodolo){
+        const vegsodarab = mp3kodolo.flush();
+        if(vegsodarab.length > 0){
+            mp3darabok.push(new Int8Array(vegsodarab));
         }
-        mp3Encoder = null;
+        mp3kodolo = null;
     }
-    isRecording = false;
-    updateRecordingUi();
-    downloadRecording();
+    rogzitesfolyamatban = false;
+    rogzitofeluletfrissites();
+    rogzitesletoltese();
 }
 
-function toggleRecording(){
-    if(isRecording){
-        stopRecording();
+function rogzitesvaltasa(){
+    if(rogzitesfolyamatban){
+        rogzitesleallitasa();
         return;
     }
-    startRecording();
+    rogzitesinditasa();
 }
 
-function translatePage(){
+function oldalforditasa(){
 
     document.querySelectorAll("[data-i18n]")
-    .forEach(element=>{
+    .forEach(elem=>{
 
-        const key =
-        element.dataset.i18n;
+        const kulcs =
+        elem.dataset.i18n;
 
         if(
-            translations[language] &&
-            translations[language][key]
+            forditasok[nyelv] &&
+            forditasok[nyelv][kulcs]
         ){
 
-            element.textContent =
-            translations[language][key];
+            elem.textContent =
+            forditasok[nyelv][kulcs];
 
         }
 
     });
 
     document.querySelectorAll("[data-i18n-aria-label]")
-    .forEach(element=>{
-        const key = element.dataset.i18nAriaLabel;
-        element.setAttribute("aria-label", translations[language][key]);
+    .forEach(elem=>{
+        const kulcs = elem.dataset.i18nAriaLabel;
+        elem.setAttribute("aria-label", forditasok[nyelv][kulcs]);
     });
 
     document.querySelectorAll("[data-i18n-title]")
-    .forEach(element=>{
-        const key = element.dataset.i18nTitle;
-        element.title = translations[language][key];
+    .forEach(elem=>{
+        const kulcs = elem.dataset.i18nTitle;
+        elem.title = forditasok[nyelv][kulcs];
     });
 
     document.querySelectorAll("[data-i18n-placeholder]")
-    .forEach(element=>{
-        const key = element.dataset.i18nPlaceholder;
-        element.placeholder = translations[language][key];
+    .forEach(elem=>{
+        const kulcs = elem.dataset.i18nPlaceholder;
+        elem.placeholder = forditasok[nyelv][kulcs];
     });
 
-    updateRecordingUi();
+    rogzitofeluletfrissites();
 
 }
 
-function getAppUrl(){
-    const url = new URL(window.location.href);
-    url.search = "";
-    url.hash = "";
-    return url;
+function alkalmazasurllekero(){
+    const urlcim = new URL(window.location.href);
+    urlcim.search = "";
+    urlcim.hash = "";
+    return urlcim;
 }
 
-function getStationUrl(station){
-    const url = getAppUrl();
-    if(station && station.stationuuid){
-        url.searchParams.set("station", station.stationuuid);
+function allomasurllekero(allomas){
+    const urlcim = alkalmazasurllekero();
+    if(allomas && allomas.stationuuid){
+        urlcim.searchParams.set("station", allomas.stationuuid);
     }
-    return url.toString();
+    return urlcim.toString();
 }
 
-function updateStationUrl(station){
-    history.replaceState({}, "", getStationUrl(station));
+function allomasurlfrissitese(allomas){
+    history.replaceState({}, "", allomasurllekero(allomas));
 }
 
-async function shareUrl(url, title, text){
-    const shareData = { title, text, url };
+async function megosztasiurl(urlcim, cim, szoveg){
+    const megosztasiadatok = { cim, szoveg, urlcim };
 
     if(navigator.share){
         try {
-            await navigator.share(shareData);
+            await navigator.share(megosztasiadatok);
             return;
-        } catch(error) {
-            if(error.name === "AbortError"){
+        } catch(hiba) {
+            if(hiba.name === "AbortError"){
                 return;
             }
         }
     }
 
     try {
-        await navigator.clipboard.writeText(url);
-        shareNoticeModal.classList.remove("hidden");
-    } catch(error) {
-        window.prompt(translations[language].copyLink, url);
+        await navigator.clipboard.writeText(urlcim);
+        megosztasieritesablak.classList.remove("hidden");
+    } catch(hiba) {
+        window.prompt(forditasok[nyelv].copyLink, urlcim);
     }
 }
 
-function closeDialog(dialog){
-    dialog.classList.add("hidden");
+function parbeszedablakbezarasa(parbeszedablak){
+    parbeszedablak.classList.add("hidden");
 }
 
-function openBugReport(){
-    bugReportModal.classList.remove("hidden");
+function hibajelentesmegnyitasa(){
+    hibajelentesablak.classList.remove("hidden");
 }
 
-async function copyBugEmail(){
+async function hibajelentesmasolasa(){
     try {
-        await navigator.clipboard.writeText(bugReportEmail);
-    } catch(error) {
-        window.prompt(translations[language].copyAddress, bugReportEmail);
+        await navigator.clipboard.writeText(hibajelentesemail);
+    } catch(hiba) {
+        window.prompt(forditasok[nyelv].copyAddress, hibajelentesemail);
     }
-    closeDialog(bugReportModal);
+    parbeszedablakbezarasa(hibajelentesablak);
 }
 
-function sharePage(){
-    shareUrl(getAppUrl().toString(), "Nova Radio", "Nova Radio");
+function oldalmegosztasa(){
+    megosztasiurl(alkalmazasurllekero().toString(), "Nova Radio", "Nova Radio");
 }
 
-function shareStation(event){
-    event?.stopPropagation();
-    if(!currentStation){
+function allomasmegosztasa(esemeny){
+    esemeny?.stopPropagation();
+    if(!jelenlegiallomas){
         return;
     }
-    shareUrl(
-        getStationUrl(currentStation),
-        currentStation.name || "Nova Radio",
-        currentStation.name || "Nova Radio"
+    megosztasiurl(
+        allomasurllekero(jelenlegiallomas),
+        jelenlegiallomas.name || "Nova Radio",
+        jelenlegiallomas.name || "Nova Radio"
     );
 }
 
-async function loadStationFromUrl(){
-    const stationId = new URLSearchParams(window.location.search).get("station");
-    if(!stationId){
+async function allomasbetolteseurlbol(){
+    const azonosito = new URLSearchParams(window.location.search).get("station");
+    if(!azonosito){
         return;
     }
 
     try {
-        const response = await fetch(`${api}/stations/byuuid/${encodeURIComponent(stationId)}`);
-        const result = await response.json();
-        if(result[0]){
-            playStation(result[0]);
+        const valasz = await fetch(`${radioapi}/stations/byuuid/${encodeURIComponent(azonosito)}`);
+        const eredmeny = await valasz.json();
+        if(eredmeny[0]){
+            allomaslejatszasa(eredmeny[0]);
         }
-    } catch(error) {
-        console.log(error);
+    } catch(hiba) {
+        console.log(hiba);
     }
 }
 
 
 
-function setLanguage(lang){
+function nyelvbeallitasa(ujnyelv){
 
-    language = lang;
+    nyelv = ujnyelv;
 
     localStorage.setItem(
         "language",
-        lang
+        nyelv
     );
 
-    translatePage();
+    oldalforditasa();
 
-    displayStations();
-    displayRecent();
+    allomasokmegjelenitese();
+    legutobbiakmegjelenitese();
 
-    displayFavorites();
+    kedvencekmegjelenitese();
 
-    nowPlaying.textContent = currentStation && currentStreamUrl
-        ? translations[language].streaming
-        : translations[language].nothingPlaying;
-    updatePlayerUi();
-    updatePlaybackButtonState();
-    const statusKey = {
+    mostszol.textContent = jelenlegiallomas && jelenlegifolyamurl
+        ? forditasok[nyelv].streaming
+        : forditasok[nyelv].nothingPlaying;
+    lejatszofeluletrissites();
+    lejatszasgombfrissitese();
+    const allapotkulcs = {
         ready: "ready",
         playing: "playing",
         buffering: "buffering",
         paused: "paused",
         error: "connectionLost"
-    }[currentStatus] || "ready";
-    setStatus(translations[language][statusKey], currentStatus);
+    }[jelenlegiallapot] || "ready";
+    allapotbeallitasa(forditasok[nyelv][allapotkulcs], jelenlegiallapot);
 
 }
 
 
 
-function getFavorites(){
+function kedvenceklekero(){
 
     return JSON.parse(
         localStorage.getItem("radioFavorites") || "[]"
@@ -563,76 +563,76 @@ function getFavorites(){
 
 
 
-function saveFavorites(list){
+function kedvencekmentese(lista){
 
     localStorage.setItem(
         "radioFavorites",
-        JSON.stringify(list)
+        JSON.stringify(lista)
     );
 
 }
 
 
 
-function isFavorite(uuid){
+function kedvenc(azonosito){
 
-    return getFavorites()
+    return kedvenceklekero()
     .some(
-        station =>
-        station.stationuuid === uuid
+        allomas =>
+        allomas.stationuuid === azonosito
     );
 
 }
 
 
 
-function toggleFavorite(station){
+function kedvencvaltasa(allomas){
 
-    let favorites =
-    getFavorites();
+    let kedvencek =
+    kedvenceklekero();
 
 
-    if(isFavorite(station.stationuuid)){
+    if(kedvenc(allomas.stationuuid)){
 
-        const confirmed =
+        const megerositve =
         confirm(
-            translations[language].confirmRemoveFavorite
+            forditasok[nyelv].confirmRemoveFavorite
         );
 
 
-        if(!confirmed){
+        if(!megerositve){
 
             return;
 
         }
 
 
-    favorites =
-    favorites.filter(
-        item =>
-        item.stationuuid !== station.stationuuid
+    kedvencek =
+    kedvencek.filter(
+        elem =>
+        elem.stationuuid !== allomas.stationuuid
     );
 
 }
 
     else {
 
-        favorites.push(station);
+        kedvencek.push(allomas);
 
     }
 
 
-    saveFavorites(favorites);
+    kedvencekmentese(kedvencek);
 
-    displayStations();
+    allomasokmegjelenitese();
 
-    displayFavorites();
+    kedvencekmegjelenitese();
 
 }
 
 
 
-function getRecent(){
+function legutobbiaklekero(){
 
     return JSON.parse(
         localStorage.getItem("radioRecent") || "[]"
@@ -642,67 +642,67 @@ function getRecent(){
 
 
 
-function saveRecent(list){
+function legutobbiakmentese(lista){
 
     localStorage.setItem(
         "radioRecent",
-        JSON.stringify(list)
+        JSON.stringify(lista)
     );
 
 }
 
 
 
-function addRecent(station){
+function legutobbiakhozzaadas(allomas){
 
-    let recent =
-    getRecent()
+    let legutobbiak =
+    legutobbiaklekero()
     .filter(
-        item =>
-        item.stationuuid !== station.stationuuid
+        elem =>
+        elem.stationuuid !== allomas.stationuuid
     );
 
 
-    recent.unshift(station);
+    legutobbiak.unshift(allomas);
 
 
-    if(recent.length > 10){
+    if(legutobbiak.length > 10){
 
-        recent = recent.slice(0,10);
+        legutobbiak = legutobbiak.slice(0,10);
 
     }
 
 
-    saveRecent(recent);
+    legutobbiakmentese(legutobbiak);
 
-    displayRecent();
+    legutobbiakmegjelenitese();
 
 }
 
 
 
-function displayRecent(){
+function legutobbiakmegjelenitese(){
 
-    recentList.innerHTML="";
+    legutobbilista.innerHTML="";
 
-    const recent = getRecent();
+    const legutobbiak = legutobbiaklekero();
 
 
-    if(recent.length === 0){
+    if(legutobbiak.length === 0){
 
-        recentList.innerHTML =
-        `<p>${translations[language].noRecent}</p>`;
+        legutobbilista.innerHTML =
+        `<p>${forditasok[nyelv].noRecent}</p>`;
 
         return;
 
     }
 
 
-    recent.forEach(
-        station=>{
+    legutobbiak.forEach(
+        allomas=>{
 
-            recentList.appendChild(
-                createCard(station)
+            legutobbilista.appendChild(
+                kartyaletrehozasa(allomas)
             );
 
         }
@@ -712,63 +712,63 @@ function displayRecent(){
 
 
 
-function clearRecent(){
+function legutobbitorles(){
 
-    const confirmed =
+    const megerositve =
     confirm(
-        translations[language].confirmClearHistory
+        forditasok[nyelv].confirmClearHistory
     );
 
 
-    if(!confirmed){
+    if(!megerositve){
 
         return;
 
     }
 
 
-    saveRecent([]);
+    legutobbiakmentese([]);
 
-    displayRecent();
+    legutobbiakmegjelenitese();
 
 }
 
 
 
-async function loadCountries(){
+async function orszagokbetoltese(){
 
-    const response =
+    const valasz =
     await fetch(
-        api + "/countries"
+        radioapi + "/countries"
     );
 
 
-    const countries =
-    await response.json();
+    const orszagok =
+    await valasz.json();
 
 
-    countries
+    orszagok
     .filter(
-        country =>
-        country.stationcount > 0
+        orszag =>
+        orszag.stationcount > 0
     )
     .sort(
-        (a,b)=>
-        a.name.localeCompare(b.name)
+        (alfa,beta)=>
+        alfa.name.localeCompare(beta.name)
     )
     .forEach(
-        country=>{
+        orszag=>{
 
-            const option =
+            const opcio =
             document.createElement("option");
 
-            option.value =
-            country.name;
+            opcio.value =
+            orszag.name;
 
-            option.textContent =
-            country.name;
+            opcio.textContent =
+            orszag.name;
 
-            countryFilter.appendChild(option);
+            orszagszuro.appendChild(opcio);
 
         }
     );
@@ -777,37 +777,37 @@ async function loadCountries(){
 
 
 
-async function loadGenres(){
+async function mufajokbetoltese(){
 
-    const response =
+    const valasz =
     await fetch(
-        api + "/tags"
+        radioapi + "/tags"
     );
 
 
-    const genres =
-    await response.json();
+    const mufajok =
+    await valasz.json();
 
 
-    genres
+    mufajok
     .sort(
-        (a,b)=>
-        b.stationcount-a.stationcount
+        (alfa,beta)=>
+        beta.stationcount-alfa.stationcount
     )
     .slice(0,400)
     .forEach(
-        tag=>{
+        cimke=>{
 
-            const option =
+            const opcio =
             document.createElement("option");
 
-            option.value =
-            tag.name;
+            opcio.value =
+            cimke.name;
 
-            option.textContent =
-            tag.name;
+            opcio.textContent =
+            cimke.name;
 
-            genreFilter.appendChild(option);
+            mufajszuro.appendChild(opcio);
 
         }
     );
@@ -816,182 +816,182 @@ async function loadGenres(){
 
 
 
-async function loadStations(reset=true){
+async function allomasokbetoltese(visszaallitas=true){
 
-    if(reset){
+    if(visszaallitas){
 
-        page=0;
+        oldal=0;
 
-        stations=[];
+        allomasok=[];
 
-        radioList.innerHTML="";
+        radiolista.innerHTML="";
 
     }
 
 
-    loading.classList.remove("hidden");
+    betoltes.classList.remove("hidden");
 
 
-    let url =
-    api +
+    let urlcim =
+    radioapi +
     "/stations/search?hidebroken=true"
     +
-    "&limit=" + pageSize
+    "&limit=" + oldalmeret
     +
-    "&offset=" + (page*pageSize);
+    "&offset=" + (oldal*oldalmeret);
 
 
 
-    if(searchInput.value.trim()){
+    if(keresobemenet.value.trim()){
 
-        url +=
+        urlcim +=
         "&name=" +
         encodeURIComponent(
-            searchInput.value
+            keresobemenet.value
         );
 
     }
 
 
-    if(countryFilter.value){
+    if(orszagszuro.value){
 
-        url +=
+        urlcim +=
         "&country=" +
         encodeURIComponent(
-            countryFilter.value
+            orszagszuro.value
         );
 
     }
 
 
-    if(genreFilter.value){
+    if(mufajszuro.value){
 
-        url +=
+        urlcim +=
         "&tag=" +
         encodeURIComponent(
-            genreFilter.value
+            mufajszuro.value
         );
 
     }
 
 
-    const response =
-    await fetch(url);
+    const valasz =
+    await fetch(urlcim);
 
 
-    const result =
-    await response.json();
+    const eredmeny =
+    await valasz.json();
 
 
-    const validResult =
-    result.filter(
-        station =>
-        station.url_resolved
+    const ervenyeseredmeny =
+    eredmeny.filter(
+        allomas =>
+        allomas.url_resolved
     );
 
 
-    stations =
-    stations.concat(validResult);
+    allomasok =
+    allomasok.concat(ervenyeseredmeny);
 
 
-    displayStations();
+    allomasokmegjelenitese();
 
 
-    page++;
+    oldal++;
 
 
-    loading.classList.add("hidden");
+    betoltes.classList.add("hidden");
 
 }
 
 
 
-function createCard(station,compact=false){
-    const row = document.createElement("div");
-    row.className = compact ? "radio-row compact" : "radio-row";
+function kartyaletrehozasa(allomas,tomor=false){
+    const sor = document.createElement("div");
+    sor.className = tomor ? "radio-row compact" : "radio-row";
 
-    const icon = document.createElement("div");
-    icon.className = "radio-row-icon";
+    const ikon = document.createElement("div");
+    ikon.className = "radio-row-icon";
 
-    const iconUrl = getStationIcon(station);
-    if(iconUrl){
-        const image = document.createElement("img");
-        image.src = iconUrl;
-        image.alt = "";
-        image.loading = "lazy";
-        image.onerror = ()=>{
-            image.remove();
-            setIcon(icon, "music");
+    const ikonurl = allomasikonlekero(allomas);
+    if(ikonurl){
+        const kep = document.createElement("img");
+        kep.src = ikonurl;
+        kep.alt = "";
+        kep.loading = "lazy";
+        kep.onerror = ()=>{
+            kep.remove();
+            ikonbeallitas(ikon, "music");
         };
-        icon.appendChild(image);
+        ikon.appendChild(kep);
     } else {
-        setIcon(icon, "music");
+        ikonbeallitas(ikon, "music");
     }
 
-    const content = document.createElement("div");
-    content.className = "radio-row-content";
+    const tartalom = document.createElement("div");
+    tartalom.className = "radio-row-content";
 
-    const title = document.createElement("div");
-    title.className = "radio-row-title";
-    setTextWithTitle(title, station.name || translations[language].unknownStation);
+    const cim = document.createElement("div");
+    cim.className = "radio-row-title";
+    szovegcimmelbeallitas(cim, allomas.name || forditasok[nyelv].unknownStation);
 
-    const sub = document.createElement("div");
-    sub.className = "radio-row-sub";
-    const genreText = station.tags || station.country || translations[language].noGenre;
-    setTextWithTitle(sub, genreText);
+    const alcim = document.createElement("div");
+    alcim.className = "radio-row-sub";
+    const mufajszoveg = allomas.tags || allomas.country || forditasok[nyelv].noGenre;
+    szovegcimmelbeallitas(alcim, mufajszoveg);
 
-    content.appendChild(title);
-    if(!compact){
-        content.appendChild(sub);
+    tartalom.appendChild(cim);
+    if(!tomor){
+        tartalom.appendChild(alcim);
     }
 
-    const protocol = document.createElement("span");
-    protocol.className = "protocol-pill";
-    protocol.textContent = (station.url_resolved || station.url || "").startsWith("https://") ? "HTTPS" : "HTTP";
+    const protokoll = document.createElement("span");
+    protokoll.className = "protocol-pill";
+    protokoll.textContent = (allomas.url_resolved || allomas.url || "").startsWith("https://") ? "HTTPS" : "HTTP";
 
-    const favoriteButton = document.createElement("button");
-    favoriteButton.className = `favorite-button ${isFavorite(station.stationuuid) ? "active" : ""}`;
-    favoriteButton.type = "button";
-    favoriteButton.appendChild(createIcon("star"));
-    favoriteButton.title = translations[language][isFavorite(station.stationuuid) ? "removeFromFavorites" : "addToFavorites"];
+    const kedvencgomb = document.createElement("button");
+    kedvencgomb.className = `favorite-button ${kedvenc(allomas.stationuuid) ? "active" : ""}`;
+    kedvencgomb.type = "button";
+    kedvencgomb.appendChild(ikonletrehozas("star"));
+    kedvencgomb.title = forditasok[nyelv][kedvenc(allomas.stationuuid) ? "removeFromFavorites" : "addToFavorites"];
 
-    row.appendChild(icon);
-    row.appendChild(content);
-    if(!compact){
-        row.appendChild(protocol);
+    sor.appendChild(ikon);
+    sor.appendChild(tartalom);
+    if(!tomor){
+        sor.appendChild(protokoll);
     }
-    row.appendChild(favoriteButton);
+    sor.appendChild(kedvencgomb);
 
-    row.onclick = event=>{
+    sor.onclick = esemeny=>{
         if(
-            event.target.closest &&
-            event.target.closest(".favorite-button")
+            esemeny.target.closest &&
+            esemeny.target.closest(".favorite-button")
         ){
-            toggleFavorite(station);
+            kedvencvaltasa(allomas);
             return;
         }
-        if(isRecording){
-            showRecordingLockMessage();
+        if(rogzitesfolyamatban){
+            rogziteszarolasuzenet();
             return;
         }
-        playStation(station);
-        sidebar.classList.remove("open");
-        overlay.classList.remove("show");
+        allomaslejatszasa(allomas);
+        oldalsav.classList.remove("open");
+        reteg.classList.remove("show");
     };
 
-    return row;
+    return sor;
 }
 
-function displayStations(){
+function allomasokmegjelenitese(){
 
-    radioList.innerHTML="";
+    radiolista.innerHTML="";
 
 
-    stations.forEach(
-        station=>{
+    allomasok.forEach(
+        allomas=>{
 
-            radioList.appendChild(
-                createCard(station)
+            radiolista.appendChild(
+                kartyaletrehozasa(allomas)
             );
 
         }
@@ -1000,106 +1000,106 @@ function displayStations(){
 }
 
 
-function displayFavorites(){
-    favoritesList.innerHTML = "";
-    const favorites = getFavorites();
+function kedvencekmegjelenitese(){
+    kedvenclista.innerHTML = "";
+    const kedvencek = kedvenceklekero();
 
-    if(favorites.length === 0){
-        favoritesList.innerHTML = `<p>${translations[language].noFavorites}</p>`;
+    if(kedvencek.length === 0){
+        kedvenclista.innerHTML = `<p>${forditasok[nyelv].noFavorites}</p>`;
         return;
     }
 
-    favorites.forEach(station=>{
-        favoritesList.appendChild(createCard(station, true));
+    kedvencek.forEach(allomas=>{
+        kedvenclista.appendChild(kartyaletrehozasa(allomas, true));
     });
 }
 
-function setStatus(text,type){
-    currentStatus = type;
-    playerStatus.textContent = text;
-    playerStatusSheet.textContent = text;
-    playerStatus.className = "status " + type;
-    playerStatusSheet.className = "status " + type;
-    updatePlayerUi();
+function allapotbeallitasa(szoveg,tipus){
+    jelenlegiallapot = tipus;
+    lejatszoallapot.textContent = szoveg;
+    lejatsolapallapot.textContent = szoveg;
+    lejatszoallapot.className = "status " + tipus;
+    lejatsolapallapot.className = "status " + tipus;
+    lejatszofeluletrissites();
 }
 
 
 
-function getRetryStreamUrl(){
+function ujraprobalasifolyamurllekero(){
 
-    if(!currentStation){
+    if(!jelenlegiallomas){
         return null;
     }
 
-    return getPlaybackUrl(currentStation.url_resolved || currentStation.url);
+    return lejatszasiurllekero(jelenlegiallomas.url_resolved || jelenlegiallomas.url);
 
 }
 
-function playStation(station){
-    if(isRecording){
-        showRecordingLockMessage();
+function allomaslejatszasa(allomas){
+    if(rogzitesfolyamatban){
+        rogziteszarolasuzenet();
         return;
     }
 
-    manualStop = false;
-    userPaused = false;
+    kezialleallitas = false;
+    felhasznaloszuneteltetett = false;
 
-    if(retryTimer){
-        clearTimeout(retryTimer);
-        retryTimer = null;
+    if(ujraprobalasiidozito){
+        clearTimeout(ujraprobalasiidozito);
+        ujraprobalasiidozito = null;
     }
 
-    currentStation = station;
-    localStorage.setItem("lastStation", JSON.stringify(station));
-    retryIndex = 0;
+    jelenlegiallomas = allomas;
+    localStorage.setItem("lastStation", JSON.stringify(allomas));
+    ujraprobalasiindex = 0;
 
-    let originalUrl = station.url_resolved || station.url;
+    let eredetiurl = allomas.url_resolved || allomas.url;
 
-    if(!originalUrl){
-        setStatus(translations[language].connectionLost, "error");
+    if(!eredetiurl){
+        allapotbeallitasa(forditasok[nyelv].connectionLost, "error");
         return;
     }
 
-    currentStreamUrl = getPlaybackUrl(originalUrl);
+    jelenlegifolyamurl = lejatszasiurllekero(eredetiurl);
 
-    updateStationUrl(station);
+    allomasurlfrissitese(allomas);
 
-    audio.src = currentStreamUrl;
+    hang.src = jelenlegifolyamurl;
 
-    audio.play().catch(()=>{
-        setStatus(translations[language].paused, "paused");
+    hang.play().catch(()=>{
+        allapotbeallitasa(forditasok[nyelv].paused, "paused");
     });
 
-    stationName.textContent = station.name;
-    nowPlaying.textContent = translations[language].streaming;
-    updatePlayerUi();
-    setStatus(translations[language].playing, "playing");
+    allomasneve.textContent = allomas.name;
+    mostszol.textContent = forditasok[nyelv].streaming;
+    lejatszofeluletrissites();
+    allapotbeallitasa(forditasok[nyelv].playing, "playing");
 
-    addRecent(station);
-    updatePlaybackButtonState();
+    legutobbiakhozzaadas(allomas);
+    lejatszasgombfrissitese();
 }
 
-function retryConnection(){
+function kapcsolatujraprobalasa(){
 
-    if(manualStop){
+    if(kezialleallitas){
         return;
     }
 
 
-  if(retryTimer){
+  if(ujraprobalasiidozito){
         return;
     }
 
-    if(!currentStation){
+    if(!jelenlegiallomas){
         return;
     }
 
-    if(retryIndex >= retryTimes.length){
+    if(ujraprobalasiindex >= ujraprobalasiidok.length){
 
-        retryTimer = null;
+        ujraprobalasiidozito = null;
 
-        setStatus(
-            translations[language].connectionLost,
+        allapotbeallitasa(
+            forditasok[nyelv].connectionLost,
             "error"
         );
 
@@ -1108,104 +1108,104 @@ function retryConnection(){
     }
 
 
-    const time =
-    retryTimes[retryIndex];
+    const ido =
+    ujraprobalasiidok[ujraprobalasiindex];
 
 
-    setStatus(
-        translations[language].retrying +
+    allapotbeallitasa(
+        forditasok[nyelv].retrying +
         " " +
-        (time/1000) +
+        (ido/1000) +
         " " +
-        translations[language].secondsSuffix,
+        forditasok[nyelv].secondsSuffix,
         "buffering"
     );
 
 
-    retryTimer =
+    ujraprobalasiidozito =
     setTimeout(()=>{
 
-        currentStreamUrl =
-        getRetryStreamUrl();
+        jelenlegifolyamurl =
+        ujraprobalasifolyamurllekero();
 
-        audio.src = currentStreamUrl;
+        hang.src = jelenlegifolyamurl;
 
-        audio.play()
+        hang.play()
         .then(()=>{
 
-            retryIndex = 0;
-            clearTimeout(retryTimer);
-            retryTimer = null;
+            ujraprobalasiindex = 0;
+            clearTimeout(ujraprobalasiidozito);
+            ujraprobalasiidozito = null;
 
         })
         .catch(()=>{
 
-            retryIndex++;
-            retryTimer = null;
-            retryConnection();
+            ujraprobalasiindex++;
+            ujraprobalasiidozito = null;
+            kapcsolatujraprobalasa();
 
         });
 
-    },time);
+    },ido);
 
 }
 
 
 
-audio.addEventListener(
+hang.addEventListener(
 "waiting",
 ()=>{
 
-    setStatus(
-        translations[language].buffering,
+    allapotbeallitasa(
+        forditasok[nyelv].buffering,
         "buffering"
     );
 
 });
 
 
-audio.addEventListener("playing", ()=>{
-    retryIndex = 0;
+hang.addEventListener("playing", ()=>{
+    ujraprobalasiindex = 0;
 
-    if(retryTimer){
-        clearTimeout(retryTimer);
-        retryTimer = null;
+    if(ujraprobalasiidozito){
+        clearTimeout(ujraprobalasiidozito);
+        ujraprobalasiidozito = null;
     }
 
-    userPaused = false;
-    setStatus(translations[language].playing, "playing");
-    updatePlaybackButtonState();
+    felhasznaloszuneteltetett = false;
+    allapotbeallitasa(forditasok[nyelv].playing, "playing");
+    lejatszasgombfrissitese();
 });
 
 
-audio.addEventListener("pause", ()=>{
-    if(userPaused){
-        setStatus(translations[language].paused, "paused");
+hang.addEventListener("pause", ()=>{
+    if(felhasznaloszuneteltetett){
+        allapotbeallitasa(forditasok[nyelv].paused, "paused");
     }
-    updatePlaybackButtonState();
+    lejatszasgombfrissitese();
 });
 
 
-audio.addEventListener(
+hang.addEventListener(
 "stalled",
 ()=>{
 
-    if(!manualStop){
+    if(!kezialleallitas){
 
-        retryConnection();
+        kapcsolatujraprobalasa();
 
     }
 
 });
 
 
-audio.addEventListener(
+hang.addEventListener(
 "error",
 ()=>{
 
-    if(!manualStop){
+    if(!kezialleallitas){
 
-        retryConnection();
+        kapcsolatujraprobalasa();
 
     }
 
@@ -1217,9 +1217,9 @@ window.addEventListener(
 "offline",
 ()=>{
 
-    if(!manualStop){
+    if(!kezialleallitas){
 
-        retryConnection();
+        kapcsolatujraprobalasa();
 
     }
 
@@ -1230,186 +1230,186 @@ window.addEventListener(
 "online",
 ()=>{
 
-    if(currentStation){
+    if(jelenlegiallomas){
 
-        retryIndex=0;
+        ujraprobalasiindex=0;
 
-        retryConnection();
+        kapcsolatujraprobalasa();
 
     }
 
 });
 
 
-function handlePlayToggle(event){
-    event?.stopPropagation();
+function lejatszaskapcsolokezeles(esemeny){
+    esemeny?.stopPropagation();
 
-    if(isRecording){
-        showRecordingLockMessage();
+    if(rogzitesfolyamatban){
+        rogziteszarolasuzenet();
         return;
     }
 
-    if(currentStation && !audio.paused && !userPaused){
-        userPaused = true;
-        audio.pause();
-        updatePlaybackButtonState();
+    if(jelenlegiallomas && !hang.paused && !felhasznaloszuneteltetett){
+        felhasznaloszuneteltetett = true;
+        hang.pause();
+        lejatszasgombfrissitese();
         return;
     }
 
-    manualStop = false;
-    userPaused = false;
-    retryIndex = 0;
+    kezialleallitas = false;
+    felhasznaloszuneteltetett = false;
+    ujraprobalasiindex = 0;
 
-    if(!currentStation){
-        const saved = localStorage.getItem("lastStation");
-        if(saved){
-            currentStation = JSON.parse(saved);
-            stationName.textContent = currentStation.name;
+    if(!jelenlegiallomas){
+        const mentett = localStorage.getItem("lastStation");
+        if(mentett){
+            jelenlegiallomas = JSON.parse(mentett);
+            allomasneve.textContent = jelenlegiallomas.name;
         } else {
             return;
         }
     }
 
-    if(!currentStreamUrl){
-        currentStreamUrl = getRetryStreamUrl();
-        audio.src = currentStreamUrl;
+    if(!jelenlegifolyamurl){
+        jelenlegifolyamurl = ujraprobalasifolyamurllekero();
+        hang.src = jelenlegifolyamurl;
     }
 
-    audio.play().catch(error=>{
-        console.log(error);
+    hang.play().catch(hiba=>{
+        console.log(hiba);
     });
 
-    updatePlaybackButtonState();
+    lejatszasgombfrissitese();
 }
 
-function handleStop(event){
-    event?.stopPropagation();
+function leallitaskezeles(esemeny){
+    esemeny?.stopPropagation();
 
-    if(isRecording){
-        showRecordingLockMessage();
+    if(rogzitesfolyamatban){
+        rogziteszarolasuzenet();
         return;
     }
 
-    manualStop = true;
+    kezialleallitas = true;
 
-    userPaused = true;
+    felhasznaloszuneteltetett = true;
 
-    if(retryTimer){
+    if(ujraprobalasiidozito){
 
-        clearTimeout(retryTimer);
-        retryTimer = null;
+        clearTimeout(ujraprobalasiidozito);
+        ujraprobalasiidozito = null;
 
     }
 
-    audio.pause();
+    hang.pause();
 
-    audio.removeAttribute("src");
+    hang.removeAttribute("src");
 
-    audio.load();
-
-
-    currentStreamUrl = null;
-
-    updateStationUrl(null);
+    hang.load();
 
 
-    setStatus(
-        translations[language].stopped,
+    jelenlegifolyamurl = null;
+
+    allomasurlfrissitese(null);
+
+
+    allapotbeallitasa(
+        forditasok[nyelv].stopped,
         "ready"
     );
 
 
-    nowPlaying.textContent =
-    translations[language].nothingPlaying || "Nothing playing";
-    updatePlayerUi();
-    updatePlaybackButtonState();
+    mostszol.textContent =
+    forditasok[nyelv].nothingPlaying || "Nothing playing";
+    lejatszofeluletrissites();
+    lejatszasgombfrissitese();
 }
 
-function handleRewind(event){
-    event?.stopPropagation();
+function visszatekereskezeles(esemeny){
+    esemeny?.stopPropagation();
 
-    if(isRecording){
-        showRecordingLockMessage();
+    if(rogzitesfolyamatban){
+        rogziteszarolasuzenet();
         return;
     }
 
-    if(audio.currentTime > 10){
-        audio.currentTime -= 10;
+    if(hang.currentTime > 10){
+        hang.currentTime -= 10;
     } else {
-        audio.currentTime = 0;
+        hang.currentTime = 0;
     }
 }
 
-function handleForward(event){
-    event?.stopPropagation();
+function eloretekereskezeles(esemeny){
+    esemeny?.stopPropagation();
 
-    if(isRecording){
-        showRecordingLockMessage();
+    if(rogzitesfolyamatban){
+        rogziteszarolasuzenet();
         return;
     }
 
-    audio.currentTime += 10;
+    hang.currentTime += 10;
 }
 
-playButton.onclick = handlePlayToggle;
-sheetPlayButton.onclick = handlePlayToggle;
-stopButton.onclick = handleStop;
-sheetStopButton.onclick = handleStop;
-rewindButton.onclick = handleRewind;
-sheetRewindButton.onclick = handleRewind;
-forwardButton.onclick = handleForward;
-sheetForwardButton.onclick = handleForward;
-sharePageButton.onclick = sharePage;
-shareStationButton.onclick = shareStation;
-recordButton.onclick = toggleRecording;
-bugReportButton.onclick = openBugReport;
-cancelBugReportButton.onclick = ()=>closeDialog(bugReportModal);
-copyBugEmailButton.onclick = copyBugEmail;
-closeShareNoticeButton.onclick = ()=>closeDialog(shareNoticeModal);
-bugReportModal.onclick = event=>{
-    if(event.target === bugReportModal){
-        closeDialog(bugReportModal);
+lejatszasgomb.onclick = lejatszaskapcsolokezeles;
+laplejatszasgomb.onclick = lejatszaskapcsolokezeles;
+leallitasgomb.onclick = leallitaskezeles;
+lapleallitasgomb.onclick = leallitaskezeles;
+visszatekeresgomb.onclick = visszatekereskezeles;
+lapvisszatekeresgomb.onclick = visszatekereskezeles;
+eloretekeresgomb.onclick = eloretekereskezeles;
+lapeloretekeresgomb.onclick = eloretekereskezeles;
+oldalmegosztogomb.onclick = oldalmegosztasa;
+allomasmegosztogomb.onclick = allomasmegosztasa;
+rogzitogomb.onclick = rogzitesvaltasa;
+hibajelentesgomb.onclick = hibajelentesmegnyitasa;
+hibajelentesmegsemegomb.onclick = ()=>parbeszedablakbezarasa(hibajelentesablak);
+hibajelentesmasologomb.onclick = hibajelentesmasolasa;
+megosztasieritesbezarogomb.onclick = ()=>parbeszedablakbezarasa(megosztasieritesablak);
+hibajelentesablak.onclick = esemeny=>{
+    if(esemeny.target === hibajelentesablak){
+        parbeszedablakbezarasa(hibajelentesablak);
     }
 };
-shareNoticeModal.onclick = event=>{
-    if(event.target === shareNoticeModal){
-        closeDialog(shareNoticeModal);
+megosztasieritesablak.onclick = esemeny=>{
+    if(esemeny.target === megosztasieritesablak){
+        parbeszedablakbezarasa(megosztasieritesablak);
     }
 };
 
 
 
-volumeSlider.oninput =
+hangerocsuszka.oninput =
 ()=>{
 
-    audio.volume =
-    volumeSlider.value;
+    hang.volume =
+    hangerocsuszka.value;
 
     localStorage.setItem(
         "volume",
-        volumeSlider.value
+        hangerocsuszka.value
     );
 
 };
 
 
 
-searchButton.onclick =
+keresogomb.onclick =
 ()=>{
 
 
-    loadStations(true);
+    allomasokbetoltese(true);
 
 };
 
 
 
-searchInput.onkeydown =
-event=>{
+keresobemenet.onkeydown =
+esemeny=>{
 
-    if(event.key==="Enter"){
+    if(esemeny.key==="Enter"){
 
-        loadStations(true);
+        allomasokbetoltese(true);
 
     }
 
@@ -1417,53 +1417,53 @@ event=>{
 
 
 
-countryFilter.onchange =
+orszagszuro.onchange =
 ()=>{
 
-    loadStations(true);
+    allomasokbetoltese(true);
 
 };
 
 
 
-genreFilter.onchange =
+mufajszuro.onchange =
 ()=>{
 
-    loadStations(true);
+    allomasokbetoltese(true);
 
 };
 
 
 
-loadMoreButton.onclick =
+tovabbiakgomb.onclick =
 ()=>{
 
-    loadStations(false);
+    allomasokbetoltese(false);
 
 };
 
 
 
-sleepTimerSelect.onchange =
+elalvasidozitovalaszto.onchange =
 ()=>{
 
-    if(sleepTimer){
+    if(elalvasidozito){
 
-        clearTimeout(sleepTimer);
-        sleepTimer = null;
+        clearTimeout(elalvasidozito);
+        elalvasidozito = null;
 
     }
 
 
-    const minutes =
-    Number(sleepTimerSelect.value);
+    const percek =
+    Number(elalvasidozitovalaszto.value);
 
 
-    if(minutes === 0){
+    if(percek === 0){
 
-        setStatus(
-            translations[language].sleepTimerCancelled,
-            currentStatus
+        allapotbeallitasa(
+            forditasok[nyelv].sleepTimerCancelled,
+            jelenlegiallapot
         );
 
         return;
@@ -1471,44 +1471,44 @@ sleepTimerSelect.onchange =
     }
 
 
-    sleepTimer =
+    elalvasidozito =
     setTimeout(()=>{
     
-        handleStop();
+        leallitaskezeles();
     
-        playerStatus.textContent =
-            translations[language].sleepTimerFinished;
+        lejatszoallapot.textContent =
+            forditasok[nyelv].sleepTimerFinished;
     
-        playerStatusSheet.textContent =
-            translations[language].sleepTimerFinished;
+        lejatsolapallapot.textContent =
+            forditasok[nyelv].sleepTimerFinished;
     
-        sleepTimer = null;
+        elalvasidozito = null;
     
-        sleepTimerSelect.value = "0";
+        elalvasidozitovalaszto.value = "0";
     
-    }, minutes * 60 * 1000);
+    }, percek * 60 * 1000);
 
 
-    setStatus(
-        translations[language].sleepTimerSet +
+    allapotbeallitasa(
+        forditasok[nyelv].sleepTimerSet +
         " " +
-        minutes +
+        percek +
         " " +
-        translations[language].minutesSuffix,
-        currentStatus
+        forditasok[nyelv].minutesSuffix,
+        jelenlegiallapot
     );
 
 };
 
 
 
-document.addEventListener("keydown", event=>{
-    if(event.code !== "Space" || event.target === searchInput){
+document.addEventListener("keydown", esemeny=>{
+    if(esemeny.code !== "Space" || esemeny.target === keresobemenet){
         return;
     }
 
-    event.preventDefault();
-    playButton.onclick();
+    esemeny.preventDefault();
+    lejatszasgomb.onclick();
 });
 
 
@@ -1520,14 +1520,14 @@ if("mediaSession" in navigator){
         navigator.mediaSession.setActionHandler(
             "play",
             ()=>{
-                handlePlayToggle();
+                lejatszaskapcsolokezeles();
             }
         );
 
         navigator.mediaSession.setActionHandler(
             "pause",
             ()=>{
-                handlePlayToggle();
+                lejatszaskapcsolokezeles();
             }
         );
 
@@ -1540,148 +1540,148 @@ if("mediaSession" in navigator){
 
 
 
-favoritesToggle.onclick =
+kedvenckapcsolo.onclick =
 ()=>{
 
-    favoritesDropdown.classList.toggle(
+    kedvenclenyilo.classList.toggle(
         "hidden"
     );
 
-    displayFavorites();
+    kedvencekmegjelenitese();
 
 };
 
 
 
-recentToggle.onclick =
+legutobbikapcsolo.onclick =
 ()=>{
 
-    recentDropdown.classList.toggle(
+    legutobbilenyilo.classList.toggle(
         "hidden"
     );
 
-    displayRecent();
+    legutobbiakmegjelenitese();
 
 };
 
 
 
-clearRecentButton.onclick =
+legutobbitorlesgomb.onclick =
 ()=>{
 
-    clearRecent();
+    legutobbitorles();
 
 };
 
 
 
-menuButton.onclick =
+menugomb.onclick =
 ()=>{
 
-    sidebar.classList.add("open");
+    oldalsav.classList.add("open");
 
-    overlay.classList.add("show");
+    reteg.classList.add("show");
 
 };
 
 
 
-closeMenuButton.onclick =
+menubezarogomb.onclick =
 ()=>{
 
-    sidebar.classList.remove("open");
+    oldalsav.classList.remove("open");
 
-    overlay.classList.remove("show");
+    reteg.classList.remove("show");
 
 };
 
 
 
-overlay.onclick = ()=>{
-    sidebar.classList.remove("open");
-    overlay.classList.remove("show");
-    setPlayerSheetOpen(false);
+reteg.onclick = ()=>{
+    oldalsav.classList.remove("open");
+    reteg.classList.remove("show");
+    lejatsolapnyitasbeallitas(false);
 };
 
-playerBar.addEventListener("click", event=>{
-    if(event.target.matches(".player-icon-button") || event.target.closest && event.target.closest(".player-icon-button")){
+lejatsosav.addEventListener("click", esemeny=>{
+    if(esemeny.target.matches(".player-icon-button") || esemeny.target.closest && esemeny.target.closest(".player-icon-button")){
         return;
     }
 
-    setPlayerSheetOpen(!playerSheet.classList.contains("open"));
+    lejatsolapnyitasbeallitas(!lejatsolap.classList.contains("open"));
 });
 
-closePlayerSheet.onclick = ()=>{
-    setPlayerSheetOpen(false);
+lejatsolapbezaro.onclick = ()=>{
+    lejatsolapnyitasbeallitas(false);
 };
 
-document.addEventListener("click", event=>{
-    if(!playerSheet.classList.contains("open")){
+document.addEventListener("click", esemeny=>{
+    if(!lejatsolap.classList.contains("open")){
         return;
     }
 
     if(
-        (event.target.closest && event.target.closest(".player-sheet")) ||
-        (event.target.closest && event.target.closest(".player-bar"))
+        (esemeny.target.closest && esemeny.target.closest(".player-sheet")) ||
+        (esemeny.target.closest && esemeny.target.closest(".player-bar"))
     ){
         return;
     }
 
-    setPlayerSheetOpen(false);
+    lejatsolapnyitasbeallitas(false);
 });
 
-document.addEventListener("keydown", event=>{
-    if(event.key === "Escape"){
-        setPlayerSheetOpen(false);
+document.addEventListener("keydown", esemeny=>{
+    if(esemeny.key === "Escape"){
+        lejatsolapnyitasbeallitas(false);
     }
 });
 
-playerBar.addEventListener("keydown", event=>{
-    if(event.key === "Enter" || event.key === " "){
-        event.preventDefault();
-        playerSheet.classList.add("open");
+lejatsosav.addEventListener("keydown", esemeny=>{
+    if(esemeny.key === "Enter" || esemeny.key === " "){
+        esemeny.preventDefault();
+        lejatsolap.classList.add("open");
     }
 });
 
 
 
-languageSelect.onchange = ()=>{
-    setLanguage(languageSelect.value);
+nyelvvalaszto.onchange = ()=>{
+    nyelvbeallitasa(nyelvvalaszto.value);
 };
 
 
 
-volumeSlider.value =
-audio.volume;
+hangerocsuszka.value =
+hang.volume;
 
-languageSelect.value = language;
+nyelvvalaszto.value = nyelv;
 
 
-translatePage();
-updatePlayerUi();
-updatePlaybackButtonState();
-setStatus(translations[language].ready, "ready");
+oldalforditasa();
+lejatszofeluletrissites();
+lejatszasgombfrissitese();
+allapotbeallitasa(forditasok[nyelv].ready, "ready");
 
-loadCountries();
-loadGenres();
-loadStations();
-loadStationFromUrl();
-displayFavorites();
-displayRecent();
+orszagokbetoltese();
+mufajokbetoltese();
+allomasokbetoltese();
+allomasbetolteseurlbol();
+kedvencekmegjelenitese();
+legutobbiakmegjelenitese();
 
-const savedStation =
+const mentettallomas =
 localStorage.getItem("lastStation");
 
 
-if(savedStation){
+if(mentettallomas){
 
-    currentStation =
-    JSON.parse(savedStation);
+    jelenlegiallomas =
+    JSON.parse(mentettallomas);
 
-    stationName.textContent =
-    currentStation.name;
+    allomasneve.textContent =
+    jelenlegiallomas.name;
 
-    updatePlayerUi();
+    lejatszofeluletrissites();
 
 }
 
@@ -1693,11 +1693,11 @@ if("serviceWorker" in navigator){
         console.log("Service Worker registered");
 
     })
-    .catch(error=>{
+    .catch(hiba=>{
 
         console.log(
             "Service Worker error:",
-            error
+            hiba
         );
 
     });

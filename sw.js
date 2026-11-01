@@ -1,6 +1,6 @@
-const CACHE_NAME = "nova-radio-v15";
+const gyorsitotar_neve = "nova-radio-v15";
 
-const FILES = [
+const fajlok = [
     "./?v=15",
     "./index.html?v=15",
     "./styles.css?v=15",
@@ -14,13 +14,13 @@ const FILES = [
 
 self.addEventListener(
 "install",
-event=>{
+esemeny=>{
 
     self.skipWaiting();
 
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-        .then(cache=>cache.addAll(FILES))
+    esemeny.waitUntil(
+        caches.open(gyorsitotar_neve)
+        .then(gyorsitotar=>gyorsitotar.addAll(fajlok))
     );
 
 });
@@ -28,13 +28,13 @@ event=>{
 
 self.addEventListener(
 "fetch",
-event=>{
+esemeny=>{
 
-    event.respondWith(
-        caches.match(event.request)
-        .then(response=>{
+    esemeny.respondWith(
+        caches.match(esemeny.request)
+        .then(valasz=>{
 
-            return response || fetch(event.request);
+            return valasz || fetch(esemeny.request);
 
         })
     );
@@ -44,16 +44,16 @@ event=>{
 
 self.addEventListener(
 "activate",
-event=>{
+esemeny=>{
 
-    event.waitUntil(
+    esemeny.waitUntil(
         caches.keys()
-        .then(keys=>{
+        .then(kulcsok=>{
 
             return Promise.all(
-                keys
-                .filter(key=>key !== CACHE_NAME)
-                .map(key=>caches.delete(key))
+                kulcsok
+                .filter(kulcs=>kulcs !== gyorsitotar_neve)
+                .map(kulcs=>caches.delete(kulcs))
             );
 
         })

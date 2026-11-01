@@ -1,4 +1,4 @@
-const translations = {
+const forditasok = {
   en: {
     menu: "Menu",
     version: "Version v10",
